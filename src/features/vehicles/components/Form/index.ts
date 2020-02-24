@@ -1,0 +1,1 @@
+export { FormVehicle } from './form';
