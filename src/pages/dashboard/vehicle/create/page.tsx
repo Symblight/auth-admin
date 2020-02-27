@@ -1,5 +1,5 @@
 import React from 'react';
-import { Breadcrumb, Card } from 'antd';
+import { Breadcrumb, Card, Button } from 'antd';
 
 import { RouteComponentProps, RouteProps } from 'react-router-dom';
 
@@ -18,6 +18,7 @@ export const AddVehiclePage: React.FC<PageProps> = () => {
       </Breadcrumb>
       <Card>
         <FormVehicle />
+        <Button type="primary">Добавить</Button>
       </Card>
     </>
   );

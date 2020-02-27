@@ -1,7 +1,6 @@
-const { resolve } = require('path')
+const { resolve } = require('path');
 
-
-const publicPath = resolve(__dirname, '..', 'public')
+const publicPath = resolve(__dirname, '..', 'public');
 
 module.exports = {
   contentBase: publicPath,
@@ -26,4 +25,4 @@ module.exports = {
   headers: {
     'Access-Control-Allow-Origin': '*',
   },
-}
+};
