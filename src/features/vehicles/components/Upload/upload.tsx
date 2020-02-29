@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-import { Upload as UploadAntd, Icon, message } from 'antd';
+import { Upload as UploadAntd, message } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
 function getBase64(img: Blob, callback: any) {
   const reader = new FileReader();
@@ -39,7 +40,7 @@ export const Upload = () => {
   };
   const uploadButton = (
     <div>
-      <Icon type={loading ? 'loading' : 'plus'} />
+      <UploadOutlined />
       <div className="ant-upload-text">Upload</div>
     </div>
   );

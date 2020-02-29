@@ -1,51 +1,34 @@
 import React from 'react';
-import { Col, Row, Input } from 'antd';
-import { FormComponentProps } from 'antd/lib/form';
-import { compose } from 'recompose';
+import { Col, Row, Input, Button } from 'antd';
 
 import { Upload } from 'features/vehicles';
 
 import { Form } from './styled';
 
-type PageProps = FormComponentProps;
+interface FormProps {}
 
-const enhance = compose<PageProps, {}>(Form.create({ name: 'login' }));
+const Index: React.FC<FormProps> = () => {
+  const [form] = Form.useForm();
 
-const Index: React.FC<PageProps> = ({ form }) => {
-  const { getFieldDecorator, validateFields } = form;
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    validateFields((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-      }
-    });
+  const onFinish = (values: unknown) => {
+    console.log(values);
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form form={form} name="add-car" onFinish={onFinish}>
       <Row>
         <Col span={18} push={6}>
           <Form.Item>
-            {getFieldDecorator('brand', {
-              rules: [{ required: true, message: 'Please input your username!' }],
-            })(<Input placeholder="Название" />)}
+            <Input placeholder="Название" />
           </Form.Item>
           <Form.Item>
-            {getFieldDecorator('price', {
-              rules: [{ required: true, message: 'Please input your Password!' }],
-            })(<Input placeholder="Цена" />)}
+            <Input placeholder="Цена" />
           </Form.Item>
           <Form.Item>
-            {getFieldDecorator('pessenger', {
-              rules: [{ required: true, message: 'Please input your Password!' }],
-            })(<Input placeholder="Пассажиры" />)}
+            <Input placeholder="Пассажиры" />
           </Form.Item>
           <Form.Item>
-            {getFieldDecorator('color', {
-              rules: [{ required: true, message: 'Please input your Password!' }],
-            })(<Input placeholder="Цвет" />)}
+            <Input placeholder="Цвет" />
           </Form.Item>
         </Col>
         <Col span={6} pull={18}>
@@ -53,32 +36,25 @@ const Index: React.FC<PageProps> = ({ form }) => {
         </Col>
       </Row>
       <Form.Item>
-        {getFieldDecorator('year', {
-          rules: [{ required: true, message: 'Please input your Password!' }],
-        })(<Input placeholder="Год" />)}
+        <Input placeholder="Год" />
       </Form.Item>
       <Form.Item>
-        {getFieldDecorator('type', {
-          rules: [{ required: true, message: 'Please input your Password!' }],
-        })(<Input placeholder="Тип Кузова" />)}
+        <Input placeholder="Тип Кузова" />
       </Form.Item>
       <Form.Item>
-        {getFieldDecorator('engine', {
-          rules: [{ required: true, message: 'Please input your Password!' }],
-        })(<Input placeholder="Объем двигателя" />)}
+        <Input placeholder="Объем двигателя" />
       </Form.Item>
       <Form.Item>
-        {getFieldDecorator('fuel', {
-          rules: [{ required: true, message: 'Please input your Password!' }],
-        })(<Input placeholder="Расход топлива" />)}
+        <Input placeholder="Расход топлива" />
       </Form.Item>
       <Form.Item>
-        {getFieldDecorator('bags', {
-          rules: [{ required: true, message: 'Please input your Password!' }],
-        })(<Input placeholder="Чемоданы" />)}
+        <Input placeholder="Чемоданы" />
       </Form.Item>
+      <Button type="primary" htmlType="submit">
+        Добавить
+      </Button>
     </Form>
   );
 };
 
-export const FormVehicle = enhance(Index);
+export const FormVehicle = Index;

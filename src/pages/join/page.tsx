@@ -1,59 +1,40 @@
 import React from 'react';
 
 import { RouteComponentProps, RouteProps } from 'react-router-dom';
-import { compose } from 'recompose';
-import { Form, Icon, Input, Button } from 'antd';
-import { FormComponentProps } from 'antd/lib/form';
-
+import { Form, Input, Button } from 'antd';
 import { FormTemplate } from 'containers';
 
 import { Wrapper } from './styled';
 
-const enhance = compose<PageProps, {}>(Form.create({ name: 'login' }));
-
-interface PageProps extends RouteComponentProps, FormComponentProps {
+interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
 }
 
-export const Page: React.FC<PageProps> = ({ form }) => {
-  const { getFieldDecorator, validateFields } = form;
+export const Page: React.FC<PageProps> = () => {
+  const [form] = Form.useForm();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    validateFields((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-      }
-    });
+  const onFinish = (values: unknown) => {
+    console.log(values);
   };
 
   return (
     <FormTemplate>
       <Wrapper>
         <div>Вход в систему</div>
-        <Form onSubmit={handleSubmit}>
-          <Form.Item>
-            {getFieldDecorator('username', {
-              rules: [{ required: true, message: 'Please input your username!' }],
-            })(
-              <Input
-                prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                placeholder="Username"
-              />,
-            )}
+        <Form form={form} name="join-user" onFinish={onFinish}>
+          <Form.Item
+            name="username"
+            rules={[{ required: true, message: 'Please input your username!' }]}
+          >
+            <Input placeholder="Username" />
           </Form.Item>
-          <Form.Item>
-            {getFieldDecorator('password', {
-              rules: [{ required: true, message: 'Please input your Password!' }],
-            })(
-              <Input
-                prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                type="password"
-                placeholder="Password"
-              />,
-            )}
+          <Form.Item
+            name="password"
+            rules={[{ required: true, message: 'Please input your password!' }]}
+          >
+            <Input type="password" placeholder="Password" />
           </Form.Item>
-          <Button type="primary" htmlType="submit" className="login-form-button">
+          <Button type="primary" htmlType="submit">
             Log in
           </Button>
         </Form>
@@ -62,4 +43,4 @@ export const Page: React.FC<PageProps> = ({ form }) => {
   );
 };
 
-export const JoinPage = enhance(Page);
+export const JoinPage = Page;

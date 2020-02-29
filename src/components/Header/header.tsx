@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu, Icon } from 'antd';
+import { Layout, Menu } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { LogoWrap, MenuUser } from './styled';
@@ -28,7 +28,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
           key="profile"
           title={
             <span>
-              <Icon type="mail" />
               <span>Профиль</span>
             </span>
           }
