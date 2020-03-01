@@ -1,40 +1,59 @@
 import React from 'react';
 
-import { Table } from 'antd';
+import { Table, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 import { PreviewImage } from '../PreviewImage';
 
-export interface TableVehicleProps {}
+const { confirm } = Modal;
 
-export const TableVehicle: React.FC<TableVehicleProps> = () => {
-  const dataSource = [
-    {
-      key: '1',
-      brand: 'Mike',
-      imageUrl: 'https://i.playground.ru/p/8WVj08Oy0i5ayj6CxmYMwA.jpeg',
-      price: '10 Downing Street',
-    },
-    {
-      key: '2',
-      brand: 'John',
-      imageUrl:
-        'https://upload.wikimedia.org/wikipedia/ru/thumb/1/15/NFS-Most-Wanted-Front.jpg/274px-NFS-Most-Wanted-Front.jpg',
-      price: '10 Downing Street',
-    },
-  ];
+export interface TableVehicleProps {
+  match: string;
+  onDelete: (value: string) => void;
+  source: TableCar[];
+}
+
+interface TableCar {
+  name: string;
+  id: string;
+  imageUrl: string;
+  price: string;
+}
+
+export const TableVehicle: React.FC<TableVehicleProps> = ({ match, onDelete, source }) => {
+  function deleteCar(id: string) {
+    onDelete(id);
+  }
+
+  function showDeleteConfirm(value: string) {
+    confirm({
+      title: 'Вы уверены что хотите удалить машину?',
+      icon: <ExclamationCircleOutlined />,
+      okText: 'Удалить',
+      okType: 'danger',
+      cancelText: 'Отмена',
+      onOk() {
+        deleteCar(value);
+      },
+    });
+  }
 
   const columns = [
     {
       title: 'Название',
-      dataIndex: 'brand',
-      key: 'brand',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text: string, record: TableCar) => (
+        <Link to={`${match}/v/${record.id}`}>{text}</Link>
+      ),
     },
     {
       title: 'Фото',
       dataIndex: 'imageUrl',
       key: 'image',
       render: (text: string) => (
-        <PreviewImage url={text} to={{ pathname: '/d', search: `?photo=${text}` }} />
+        <PreviewImage url={text} to={{ pathname: match, search: `?photo=${text}` }} />
       ),
     },
     {
@@ -42,10 +61,22 @@ export const TableVehicle: React.FC<TableVehicleProps> = () => {
       dataIndex: 'price',
       key: 'price',
     },
+    {
+      title: '',
+      dataIndex: '',
+      key: 'edit',
+      render: (text: string, record: TableCar) => (
+        <Link to={`${match}/v/${record.id}/edit`}>Редактировать</Link>
+      ),
+    },
+    {
+      title: '',
+      dataIndex: '',
+      key: 'remove',
+      render: (text: string, record: TableCar) => (
+        <span onClick={() => showDeleteConfirm(record.id)}>Удалить</span>
+      ),
+    },
   ];
-  return (
-    <>
-      <Table dataSource={dataSource} columns={columns} />
-    </>
-  );
+  return <Table dataSource={source} columns={columns} />;
 };

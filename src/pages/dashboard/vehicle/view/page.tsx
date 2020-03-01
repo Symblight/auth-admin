@@ -1,18 +1,23 @@
 import React from 'react';
-import { Breadcrumb, Card } from 'antd';
+import { Card } from 'antd';
 
-import { RouteComponentProps, RouteProps } from 'react-router-dom';
+import { RouteComponentProps, RouteProps, Link, useRouteMatch } from 'react-router-dom';
+import { Breadcrumb } from 'components';
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
 }
 
 export const VehiclePage: React.FC<PageProps> = () => {
+  const match = useRouteMatch<{ id: string }>();
+
   return (
     <>
       <Breadcrumb>
-        <Breadcrumb.Item>Автомобили</Breadcrumb.Item>
-        <Breadcrumb.Item>Название</Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to="/d">Автомобили</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>{match.params.id}</Breadcrumb.Item>
       </Breadcrumb>
       <Card>Vehicle page</Card>
     </>

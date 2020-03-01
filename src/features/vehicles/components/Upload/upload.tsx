@@ -31,7 +31,6 @@ export const Upload = () => {
       return;
     }
     if (info.file.status === 'done') {
-      // Get this url from response in real world.
       getBase64(info.file.originFileObj, (imageUrl: string) => {
         setImg(imageUrl);
         setLoading(false);

@@ -1,1 +1,1 @@
-export { FormVehicle } from './form';
+export * from './form';

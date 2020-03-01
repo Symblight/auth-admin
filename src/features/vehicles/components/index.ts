@@ -1,3 +1,3 @@
 export { TableVehicle } from './TableVehicles';
-export { FormVehicle } from './Form';
+export * from './Form';
 export { Upload } from './Upload';
