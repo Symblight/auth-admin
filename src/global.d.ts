@@ -54,8 +54,11 @@ declare module '*.module.css' {
 declare const __BROWSER__: boolean;
 declare const __SERVER__: boolean;
 
+type TConfig = {
+  apiURL: string;
+};
+
 interface Window {
-  browserHistory: any;
-  store: any;
+  config: TConfig;
   __PRELOADED_STATE__: any;
 }

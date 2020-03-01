@@ -6,15 +6,21 @@ import { FormTemplate } from 'containers';
 
 import { Wrapper } from './styled';
 
+export type Value = {
+  email: string;
+  password: string;
+};
+
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
+  onLogin: (values: Value) => void;
 }
 
-export const Page: React.FC<PageProps> = () => {
+export const Page: React.FC<PageProps> = ({ onLogin }) => {
   const [form] = Form.useForm();
 
-  const onFinish = (values: unknown) => {
-    console.log(values);
+  const onFinish = (values: any) => {
+    onLogin(values);
   };
 
   return (
@@ -23,7 +29,7 @@ export const Page: React.FC<PageProps> = () => {
         <div>Вход в систему</div>
         <Form form={form} name="join-user" onFinish={onFinish}>
           <Form.Item
-            name="username"
+            name="email"
             rules={[{ required: true, message: 'Please input your username!' }]}
           >
             <Input placeholder="Username" />
@@ -42,5 +48,3 @@ export const Page: React.FC<PageProps> = () => {
     </FormTemplate>
   );
 };
-
-export const JoinPage = Page;

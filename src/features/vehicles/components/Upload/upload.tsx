@@ -21,7 +21,7 @@ function beforeUpload(file: File) {
   return isJpgOrPng && isLt2M;
 }
 
-export const Upload = () => {
+export const Upload = ({ ...props }) => {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImg] = useState('');
 
@@ -45,7 +45,7 @@ export const Upload = () => {
   );
   return (
     <UploadAntd
-      name="avatar"
+      {...props}
       listType="picture-card"
       className="avatar-uploader"
       showUploadList={false}
