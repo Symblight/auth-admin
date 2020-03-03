@@ -3,15 +3,17 @@ import { Card, Button } from 'antd';
 
 import { Breadcrumb } from 'components';
 import { RouteComponentProps, RouteProps, Link, useRouteMatch } from 'react-router-dom';
-import { FormVehicle, Values } from 'features/vehicles';
+import { FormVehicle } from 'features/vehicles';
+import { TCar } from 'stores';
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
+  data: TCar | null;
 }
 
-export const EditVehiclePage: React.FC<PageProps> = () => {
+export const Page: React.FC<PageProps> = ({ data }) => {
   const match = useRouteMatch<{ id: string }>();
-  const handleSubmit = (values: Values) => {
+  const handleSubmit = (values: any) => {
     console.log(values);
   };
 
@@ -35,7 +37,7 @@ export const EditVehiclePage: React.FC<PageProps> = () => {
         <Breadcrumb.Item>Редактировать</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
-        <FormVehicle submitButton={submit()} onSubmit={handleSubmit} />
+        <FormVehicle data={data} submitButton={submit()} onSubmit={handleSubmit} />
       </Card>
     </>
   );

@@ -1,1 +1,1 @@
-export { EditVehiclePage } from './page';
+export { EditVehiclePage } from './model';

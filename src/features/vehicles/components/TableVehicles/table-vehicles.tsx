@@ -3,6 +3,7 @@ import React from 'react';
 import { Table, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import { TCar } from 'stores';
 
 import { PreviewImage } from '../PreviewImage';
 
@@ -11,14 +12,7 @@ const { confirm } = Modal;
 export interface TableVehicleProps {
   match: string;
   onDelete: (value: string) => void;
-  source: TableCar[];
-}
-
-interface TableCar {
-  name: string;
-  id: string;
-  imageUrl: string;
-  price: string;
+  source: TCar[];
 }
 
 export const TableVehicle: React.FC<TableVehicleProps> = ({ match, onDelete, source }) => {
@@ -42,11 +36,9 @@ export const TableVehicle: React.FC<TableVehicleProps> = ({ match, onDelete, sou
   const columns = [
     {
       title: 'Название',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text: string, record: TableCar) => (
-        <Link to={`${match}/v/${record.id}`}>{text}</Link>
-      ),
+      dataIndex: 'title',
+      key: 'title',
+      render: (text: string, record: TCar) => <Link to={`${match}/v/${record.id}`}>{text}</Link>,
     },
     {
       title: 'Фото',
@@ -65,7 +57,7 @@ export const TableVehicle: React.FC<TableVehicleProps> = ({ match, onDelete, sou
       title: '',
       dataIndex: '',
       key: 'edit',
-      render: (text: string, record: TableCar) => (
+      render: (text: string, record: TCar) => (
         <Link to={`${match}/v/${record.id}/edit`}>Редактировать</Link>
       ),
     },
@@ -73,8 +65,8 @@ export const TableVehicle: React.FC<TableVehicleProps> = ({ match, onDelete, sou
       title: '',
       dataIndex: '',
       key: 'remove',
-      render: (text: string, record: TableCar) => (
-        <span onClick={() => showDeleteConfirm(record.id)}>Удалить</span>
+      render: (text: string, record: TCar) => (
+        <span onClick={() => record.id && showDeleteConfirm(record.id)}>Удалить</span>
       ),
     },
   ];

@@ -14,6 +14,10 @@ interface RequestConfig<T> {
   data?: T;
 }
 
+interface RequestProps<T> {
+  data: T;
+}
+
 function getApiUrl(path: string, rootRelative?: string) {
   if (rootRelative) {
     return url.resolve(API_URL, path);
@@ -22,17 +26,16 @@ function getApiUrl(path: string, rootRelative?: string) {
   const apiUrl = url.parse(API_URL);
 
   const parsedPath = url.parse(path);
-  const pathname = joinPath(apiUrl.pathname || '', parsedPath.pathname || '');
 
   return url.format({
+    host: apiUrl.host,
     protocol: apiUrl.protocol,
-    hostname: apiUrl.hostname,
-    pathname: pathname,
+    pathname: joinPath(apiUrl.pathname || '', parsedPath.pathname || ''),
     search: parsedPath.search,
   });
 }
 
-export function Request<T>(request: RequestConfig<T>) {
+export function Request<T>(request: RequestConfig<T>): Promise<RequestProps<T>> {
   const formattedUrl = getApiUrl(request.url);
   const headers = {
     Accept: 'application/json',

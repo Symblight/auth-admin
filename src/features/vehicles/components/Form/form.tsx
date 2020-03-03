@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Col, Row, Input, DatePicker, Upload, message, Modal } from 'antd';
+import React, { useState, useEffect } from 'react';
+import moment from 'moment';
+import { Col, Row, Input, DatePicker, Upload, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 
-// import { Upload } from 'features/vehicles';
+import { TStore, TCar } from 'stores';
 
 import { Form } from './styled';
 
@@ -10,28 +11,26 @@ const { YearPicker } = DatePicker;
 
 interface FormProps {
   submitButton: React.ReactNode;
-  onSubmit: (values: Values) => void;
+  onSubmit: (values: TCar) => void;
+  data?: TCar | null;
 }
 
-export interface Values {
-  name: string;
-  price: string;
-  passenger: string;
-  color: string;
-  year: string;
-  carcase: string;
-  engine: string;
-  fuel: string;
-  bugs: string;
-}
-
-const Index: React.FC<FormProps> = ({ submitButton, onSubmit }) => {
+const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImg] = useState('');
 
+  useEffect(() => {
+    if (data) {
+      form.setFieldsValue({
+        ...data,
+        year: moment(data.year),
+      });
+    }
+  }, [data]);
+
   const onFinish = (values: any) => {
-    onSubmit(values);
+    onSubmit({ ...values, imageUrl: values.imageUrl[0].response.path });
   };
 
   const normFile = (e: any) => {
@@ -65,6 +64,7 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit }) => {
       return;
     }
     if (info.file.status === 'done') {
+      console.log(info);
       getBase64(info.file.originFileObj, (imageUrl: string) => {
         setImg(imageUrl);
         setLoading(false);
@@ -76,7 +76,7 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit }) => {
     <Form form={form} name="add-car" onFinish={onFinish}>
       <Row>
         <Col span={18} push={6}>
-          <Form.Item name="name" rules={[{ required: true, message: 'Укажите название' }]}>
+          <Form.Item name="title" rules={[{ required: true, message: 'Укажите название' }]}>
             <Input placeholder="Название" />
           </Form.Item>
           <Form.Item name="price" rules={[{ required: true, message: 'Укажите цену' }]}>
@@ -95,7 +95,7 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit }) => {
         <Col span={6} pull={18}>
           <Form.Item label="Dragger">
             <Form.Item
-              name="dragger"
+              name="imageUrl"
               valuePropName="fileList"
               getValueFromEvent={normFile}
               noStyle

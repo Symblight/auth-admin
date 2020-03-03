@@ -2,17 +2,21 @@ import React from 'react';
 import { Card, Button } from 'antd';
 
 import { RouteComponentProps, RouteProps, Link } from 'react-router-dom';
+import { observer } from 'mobx-react';
 
-import { FormVehicle, Values } from 'features/vehicles';
-import { Breadcrumb } from 'components';
+import { TStore, TCar } from 'stores';
+
+import { FormVehicle } from 'features/vehicles';
+import { useStores, Breadcrumb } from 'components';
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
 }
 
-export const AddVehiclePage: React.FC<PageProps> = () => {
-  const handleSubmit = (values: Values) => {
-    console.log(values);
+export const AddVehiclePage: React.FC<PageProps> = observer(() => {
+  const { cars } = useStores<TStore>();
+  const handleSubmit = (values: TCar) => {
+    cars.setApiCar(values);
   };
 
   function submit() {
@@ -36,4 +40,4 @@ export const AddVehiclePage: React.FC<PageProps> = () => {
       </Card>
     </>
   );
-};
+});
