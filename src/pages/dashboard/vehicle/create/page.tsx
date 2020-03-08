@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Button } from 'antd';
 
-import { RouteComponentProps, RouteProps, Link } from 'react-router-dom';
+import { RouteComponentProps, RouteProps, Link, useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
 import { TStore, TCar } from 'stores';
@@ -14,14 +14,19 @@ interface PageProps extends RouteComponentProps {
 }
 
 export const AddVehiclePage: React.FC<PageProps> = observer(() => {
+  const history = useHistory();
+  const [loading, setLoading] = useState(false);
   const { cars } = useStores<TStore>();
-  const handleSubmit = (values: TCar) => {
-    cars.setApiCar(values);
+  const handleSubmit = async (values: TCar) => {
+    await setLoading(true);
+    await cars.setApiCar(values);
+    await setLoading(false);
+    history.push('/d');
   };
 
   function submit() {
     return (
-      <Button type="primary" htmlType="submit">
+      <Button loading={loading} type="primary" htmlType="submit">
         Добавить
       </Button>
     );

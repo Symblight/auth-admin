@@ -12,7 +12,7 @@ interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
 }
 
-export const EditVehiclePage: React.FC<PageProps> = observer(({ ...props }) => {
+export const VehiclePage: React.FC<PageProps> = observer(({ ...props }) => {
   const [data, setData] = useState<TCar | null>(null);
   const match = useRouteMatch<{ id: string }>();
   const { cars } = useStores<TStore>();

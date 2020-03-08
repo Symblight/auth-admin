@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { Table, Modal } from 'antd';
+import _ from 'lodash';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { TCar } from 'stores';
-
-import { PreviewImage } from '../PreviewImage';
+import { TCar, TPagination } from 'stores';
+import { Pagination, PreviewImage } from 'components';
 
 const { confirm } = Modal;
 
@@ -13,9 +13,19 @@ export interface TableVehicleProps {
   match: string;
   onDelete: (value: string) => void;
   source: TCar[];
+  pagination: TPagination;
+  loading: boolean;
+  search: string;
 }
 
-export const TableVehicle: React.FC<TableVehicleProps> = ({ match, onDelete, source }) => {
+export const TableVehicle: React.FC<TableVehicleProps> = ({
+  match,
+  onDelete,
+  source,
+  pagination,
+  loading,
+  search,
+}) => {
   function deleteCar(id: string) {
     onDelete(id);
   }
@@ -45,7 +55,7 @@ export const TableVehicle: React.FC<TableVehicleProps> = ({ match, onDelete, sou
       dataIndex: 'imageUrl',
       key: 'image',
       render: (text: string) => (
-        <PreviewImage url={text} to={{ pathname: match, search: `?photo=${text}` }} />
+        <PreviewImage url={{ path: match, search: `${search}&photo=${text}` }} />
       ),
     },
     {
@@ -70,5 +80,17 @@ export const TableVehicle: React.FC<TableVehicleProps> = ({ match, onDelete, sou
       ),
     },
   ];
-  return <Table dataSource={source} columns={columns} />;
+
+  return (
+    <>
+      <Table
+        dataSource={source}
+        columns={columns}
+        pagination={false}
+        loading={loading}
+        rowKey={() => _.uniqueId('row-')}
+      />
+      <Pagination pagination={pagination} />
+    </>
+  );
 };

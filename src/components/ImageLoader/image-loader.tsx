@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-import { Image } from './styled';
+import { Image as ImageComponent } from './styled';
 
 interface ImageLoaderProps {
   src: string;
@@ -23,17 +23,21 @@ export const ImageLoader: React.FC<ImageLoaderProps> = ({ src, onWidth }) => {
   }
 
   useEffect(() => {
-    if (ref.current) {
-      const widthClient = ref.current.getBoundingClientRect().width;
-      const heightClient = ref.current.getBoundingClientRect().height;
+    const mainImage = new Image();
+    mainImage.onload = () => {
+      if (ref.current) {
+        const widthClient = ref.current.getBoundingClientRect().width;
+        const heightClient = ref.current.getBoundingClientRect().height;
 
-      setSize({
-        ...calculateAspectRatioFit(widthClient, heightClient, 855, 630),
-      });
+        setSize({
+          ...calculateAspectRatioFit(widthClient, heightClient, 855, 630),
+        });
 
-      onWidth(calculateAspectRatioFit(widthClient, heightClient, 855, 630).width + 50);
-    }
-  }, [onWidth]);
+        onWidth(calculateAspectRatioFit(widthClient, heightClient, 855, 630).width + 50);
+      }
+    };
+    mainImage.src = src;
+  }, [src, onWidth]);
 
-  return <Image style={{ ...size }} ref={ref} src={src || '#'} alt="img" />;
+  return <ImageComponent style={{ ...size }} ref={ref} src={src || '#'} alt="img" />;
 };

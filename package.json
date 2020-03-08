@@ -60,9 +60,11 @@
     "workbox-webpack-plugin": "^5.0.0"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.149",
     "antd": "^4.0.0",
     "axios": "^0.19.2",
     "history": "^4.10.1",
+    "lodash": "^4.17.15",
     "mobx": "^5.15.4",
     "mobx-logger": "^0.7.1",
     "mobx-react": "^6.1.8",

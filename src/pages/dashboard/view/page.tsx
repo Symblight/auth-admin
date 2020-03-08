@@ -1,14 +1,16 @@
 import React from 'react';
 
-import { RouteComponentProps, Switch, RouteProps } from 'react-router-dom';
+import { RouteComponentProps, Switch, RouteProps, useLocation, useHistory } from 'react-router-dom';
 import { RouteWithSubRoutes } from 'libs/routes';
-import { DashboardTemplate } from 'containers';
+import { ModalImage, DashboardTemplate } from 'containers';
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
 }
 
 export const DashboardPage: React.FC<PageProps> = ({ routes }) => {
+  const location = useLocation();
+  const history = useHistory();
   return (
     <DashboardTemplate>
       <Switch>
@@ -16,6 +18,7 @@ export const DashboardPage: React.FC<PageProps> = ({ routes }) => {
           <RouteWithSubRoutes key={i} {...route} />
         ))}
       </Switch>
+      <ModalImage location={location} history={history} />
     </DashboardTemplate>
   );
 };

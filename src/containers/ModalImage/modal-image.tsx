@@ -19,12 +19,17 @@ export const ModalImage: React.FC<ModalImageProps> = ({ location, history }) => 
     setWidthModal(width);
   }
 
+  function getSearchParamsWithoutPhoto() {
+    params.delete('photo');
+    return params.toString();
+  }
+
   if (!params.get('photo')) return null;
 
   return (
     <Modal
       onCancel={() => {
-        history.push(location.pathname);
+        history.push(location.pathname + '?' + getSearchParamsWithoutPhoto());
       }}
       visible={Boolean(params.get('photo'))}
       footer={false}

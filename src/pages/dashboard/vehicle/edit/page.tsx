@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Button } from 'antd';
+import { Card, Button, Skeleton } from 'antd';
 
 import { Breadcrumb } from 'components';
 import { RouteComponentProps, RouteProps, Link, useRouteMatch } from 'react-router-dom';
@@ -9,9 +9,10 @@ import { TCar } from 'stores';
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
   data: TCar | null;
+  loading: boolean;
 }
 
-export const Page: React.FC<PageProps> = ({ data }) => {
+export const Page: React.FC<PageProps> = ({ data, loading }) => {
   const match = useRouteMatch<{ id: string }>();
   const handleSubmit = (values: any) => {
     console.log(values);
@@ -37,7 +38,11 @@ export const Page: React.FC<PageProps> = ({ data }) => {
         <Breadcrumb.Item>Редактировать</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
-        <FormVehicle data={data} submitButton={submit()} onSubmit={handleSubmit} />
+        {!loading ? (
+          <FormVehicle data={data} submitButton={submit()} onSubmit={handleSubmit} />
+        ) : (
+          <Skeleton active={loading} />
+        )}
       </Card>
     </>
   );

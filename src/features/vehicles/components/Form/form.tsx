@@ -1,24 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
-import { Col, Row, Input, DatePicker, Upload, message } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import _ from 'lodash';
+import { Input, DatePicker, Upload, message } from 'antd';
+import { UploadOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
-import { TStore, TCar } from 'stores';
+import { TCar } from 'stores';
 
 import { Form } from './styled';
 
 const { YearPicker } = DatePicker;
 
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+
 interface FormProps {
   submitButton: React.ReactNode;
   onSubmit: (values: TCar) => void;
-  data?: TCar | null;
+  data: TCar;
 }
 
 const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImg] = useState('');
+  const [imageUrl, setImg] = useState(data ? data.imageUrl : '');
+  const [album, setAlbums] = useState<string[]>([]);
 
   useEffect(() => {
     if (data) {
@@ -27,10 +34,28 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
         year: moment(data.year),
       });
     }
-  }, [data]);
+  }, [form, data]);
+
+  function getPhotosPath(values: any) {
+    return values.fileList.map((item: any) => item.response.path);
+  }
+
+  function getDefaultFiles(files: string[]): any {
+    return files.map((file: string) => ({
+      uid: _.uniqueId('files-'),
+      name: file,
+      status: 'done',
+      url: file,
+      thumbUrl: file,
+    }));
+  }
 
   const onFinish = (values: any) => {
-    onSubmit({ ...values, imageUrl: values.imageUrl[0].response.path });
+    onSubmit({
+      ...values,
+      imageUrl: values.imageUrl[0].response.path,
+      imagesUrl: getPhotosPath(values.imagesUrl),
+    });
   };
 
   const normFile = (e: any) => {
@@ -64,7 +89,6 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
       return;
     }
     if (info.file.status === 'done') {
-      console.log(info);
       getBase64(info.file.originFileObj, (imageUrl: string) => {
         setImg(imageUrl);
         setLoading(false);
@@ -72,67 +96,116 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
     }
   };
 
+  const handleChangeAlbum = (info: any) => {
+    if (info.file.status === 'uploading') {
+      setLoading(true);
+      return;
+    }
+    if (info.file.status === 'done') {
+      getBase64(info.file.originFileObj, (imageUrl: string) => {
+        setAlbums([...album, imageUrl]);
+        setLoading(false);
+      });
+    }
+  };
+  const uploadButton = (
+    <div>
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div className="ant-upload-text">Upload</div>
+    </div>
+  );
+
   return (
-    <Form form={form} name="add-car" onFinish={onFinish}>
-      <Row>
-        <Col span={18} push={6}>
-          <Form.Item name="title" rules={[{ required: true, message: 'Укажите название' }]}>
-            <Input placeholder="Название" />
-          </Form.Item>
-          <Form.Item name="price" rules={[{ required: true, message: 'Укажите цену' }]}>
-            <Input placeholder="Цена" />
-          </Form.Item>
-          <Form.Item
-            name="passenger"
-            rules={[{ required: true, message: 'Укажите кол-во пассажиров' }]}
+    <Form {...layout} form={form} name="add-car" onFinish={onFinish}>
+      <Form.Item label="Картинка">
+        <Form.Item
+          name="imageUrl"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+          rules={[{ required: true, message: 'Укажите картинку' }]}
+        >
+          <Upload
+            listType="picture-card"
+            showUploadList={false}
+            name="file"
+            action={window.config.apiURL + '/upload'}
+            beforeUpload={beforeUpload}
+            onChange={handleChange}
           >
-            <Input placeholder="Пассажиры" />
-          </Form.Item>
-          <Form.Item name="color" rules={[{ required: true, message: 'Укажите цвет' }]}>
-            <Input placeholder="Цвет" />
-          </Form.Item>
-        </Col>
-        <Col span={6} pull={18}>
-          <Form.Item label="Dragger">
-            <Form.Item
-              name="imageUrl"
-              valuePropName="fileList"
-              getValueFromEvent={normFile}
-              noStyle
-              rules={[{ required: true, message: 'Укажите картинку' }]}
-            >
-              <Upload
-                listType="picture-card"
-                showUploadList={false}
-                name="file"
-                action={window.config.apiURL + '/upload'}
-                beforeUpload={beforeUpload}
-                onChange={handleChange}
-              >
-                {imageUrl ? (
-                  <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
-                ) : (
-                  <UploadOutlined />
-                )}
-              </Upload>
-            </Form.Item>
-          </Form.Item>
-        </Col>
-      </Row>
-      <Form.Item name="year" rules={[{ type: 'object', required: true, message: 'Укажите год' }]}>
+            {imageUrl ? (
+              <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+            ) : (
+              uploadButton
+            )}
+          </Upload>
+        </Form.Item>
+      </Form.Item>
+      <Form.Item
+        label="Название"
+        name="title"
+        rules={[{ required: true, message: 'Укажите название' }]}
+      >
+        <Input placeholder="Название" />
+      </Form.Item>
+      <Form.Item label="Цена" name="price" rules={[{ required: true, message: 'Укажите цену' }]}>
+        <Input placeholder="Цена" />
+      </Form.Item>
+      <Form.Item
+        name="passenger"
+        label="Кол-во пассажиров"
+        rules={[{ required: true, message: 'Укажите кол-во пассажиров' }]}
+      >
+        <Input placeholder="Пассажиры" />
+      </Form.Item>
+      <Form.Item label="Цвет" name="color" rules={[{ required: true, message: 'Укажите цвет' }]}>
+        <Input placeholder="Цвет" />
+      </Form.Item>
+      <Form.Item
+        label="Год выпуска"
+        name="year"
+        rules={[{ type: 'object', required: true, message: 'Укажите год' }]}
+      >
         <YearPicker placeholder="Год выпуска" />
       </Form.Item>
-      <Form.Item name="carcase" rules={[{ required: true, message: 'Укажите кузов' }]}>
+      <Form.Item
+        label="Тип Кузова"
+        name="carcase"
+        rules={[{ required: true, message: 'Укажите кузов' }]}
+      >
         <Input placeholder="Тип Кузова" />
       </Form.Item>
-      <Form.Item name="engine" rules={[{ required: true, message: 'Укажите объем двигателя' }]}>
+      <Form.Item
+        label="Объем двигателя"
+        name="engine"
+        rules={[{ required: true, message: 'Укажите объем двигателя' }]}
+      >
         <Input placeholder="Объем двигателя" />
       </Form.Item>
-      <Form.Item name="fuel" rules={[{ required: true, message: 'Укажите расход топлива' }]}>
+      <Form.Item
+        label="Расход топлива"
+        name="fuel"
+        rules={[{ required: true, message: 'Укажите расход топлива' }]}
+      >
         <Input placeholder="Расход топлива" />
       </Form.Item>
-      <Form.Item name="bags" rules={[{ required: true, message: 'Укажите кол-во чемодан' }]}>
+      <Form.Item
+        label="Чемоданы"
+        name="bags"
+        rules={[{ required: true, message: 'Укажите кол-во чемодан' }]}
+      >
         <Input placeholder="Чемоданы" />
+      </Form.Item>
+      <Form.Item label="Альбом" name="imagesUrl" valuePropName="fileListPhoto">
+        <Upload
+          name="file"
+          action={window.config.apiURL + '/upload'}
+          beforeUpload={beforeUpload}
+          onChange={handleChangeAlbum}
+          listType="picture-card"
+          defaultFileList={[...getDefaultFiles(data.imagesUrl)]}
+        >
+          <UploadOutlined /> Upload
+        </Upload>
       </Form.Item>
       {submitButton}
     </Form>
