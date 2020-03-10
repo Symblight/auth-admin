@@ -4,15 +4,24 @@ import { Card, Button, Skeleton } from 'antd';
 import { Breadcrumb } from 'components';
 import { RouteComponentProps, RouteProps, Link, useRouteMatch } from 'react-router-dom';
 import { FormVehicle } from 'features/vehicles';
-import { TCar } from 'stores';
+import { TCar, TCategory } from 'stores';
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
   data: TCar | null;
   loading: boolean;
+  categories: TCategory[];
+  lodaingCategories: boolean;
+  onFetchCategories: () => void;
 }
 
-export const Page: React.FC<PageProps> = ({ data, loading }) => {
+export const Page: React.FC<PageProps> = ({
+  data,
+  loading,
+  categories,
+  lodaingCategories,
+  onFetchCategories,
+}) => {
   const match = useRouteMatch<{ id: string }>();
   const handleSubmit = (values: any) => {
     console.log(values);
@@ -39,7 +48,14 @@ export const Page: React.FC<PageProps> = ({ data, loading }) => {
       </Breadcrumb>
       <Card>
         {!loading ? (
-          <FormVehicle data={data} submitButton={submit()} onSubmit={handleSubmit} />
+          <FormVehicle
+            categories={categories}
+            lodaingCategories={lodaingCategories}
+            onFetchCategories={onFetchCategories}
+            data={data || null}
+            submitButton={submit()}
+            onSubmit={handleSubmit}
+          />
         ) : (
           <Skeleton active={loading} />
         )}

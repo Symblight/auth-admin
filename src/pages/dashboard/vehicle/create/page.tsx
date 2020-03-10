@@ -4,7 +4,7 @@ import { Card, Button } from 'antd';
 import { RouteComponentProps, RouteProps, Link, useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
-import { TStore, TCar } from 'stores';
+import { TStore, TCar, TCategory } from 'stores';
 
 import { FormVehicle } from 'features/vehicles';
 import { useStores, Breadcrumb } from 'components';
@@ -13,10 +13,12 @@ interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
 }
 
-export const AddVehiclePage: React.FC<PageProps> = observer(() => {
+export const AddVehiclePage: React.FC<PageProps> = observer(({}) => {
   const history = useHistory();
   const [loading, setLoading] = useState(false);
+  const [lodaingCategories, setLoadingCategories] = useState(false);
   const { cars } = useStores<TStore>();
+
   const handleSubmit = async (values: TCar) => {
     await setLoading(true);
     await cars.setApiCar(values);
@@ -32,6 +34,16 @@ export const AddVehiclePage: React.FC<PageProps> = observer(() => {
     );
   }
 
+  async function handleFetchCategories() {
+    try {
+      setLoadingCategories(true);
+      await cars.getCategories();
+      setLoadingCategories(false);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <>
       <Breadcrumb>
@@ -41,7 +53,13 @@ export const AddVehiclePage: React.FC<PageProps> = observer(() => {
         <Breadcrumb.Item>Добавить</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
-        <FormVehicle submitButton={submit()} onSubmit={handleSubmit} />
+        <FormVehicle
+          categories={cars.categories}
+          lodaingCategories={lodaingCategories}
+          onFetchCategories={handleFetchCategories}
+          submitButton={submit()}
+          onSubmit={handleSubmit}
+        />
       </Card>
     </>
   );

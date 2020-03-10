@@ -61,8 +61,8 @@ export const Page: React.FC<PageProps> = ({ data, loading }) => {
             </Link>
             <Button type="danger">Удалить</Button>
           </Header>
-          <Image src={data.imageUrl} alt="car" />
-          <Photos>{data.imagesUrl && renderImages(data.imagesUrl)}</Photos>
+          <Image src={data.image_url} alt="car" />
+          <Photos>{data.images_url && renderImages(data.images_url)}</Photos>
           <Descriptions title="Автомобиль">
             <Descriptions.Item label="Название">{data.title}</Descriptions.Item>
             <Descriptions.Item label="Цвет">{data.color}</Descriptions.Item>

@@ -77,7 +77,7 @@ module.exports = {
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      title: 'Rent car',
+      title: 'Административная панель',
       inject: 'body',
       template: ENTRY_HTML_FILE,
       favicon: resolve(__dirname, '..', 'public/favicon.ico'),

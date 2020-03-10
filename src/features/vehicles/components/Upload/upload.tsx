@@ -53,7 +53,7 @@ export const Upload = ({ ...props }) => {
       beforeUpload={beforeUpload}
       onChange={handleChange}
     >
-      {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+      {image_url ? <img src={image_url} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
     </UploadAntd>
   );
 };

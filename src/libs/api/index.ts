@@ -14,8 +14,8 @@ interface RequestConfig<T> {
   data?: T;
 }
 
-interface RequestProps<T> {
-  data: T;
+interface Response<T> {
+  data?: T;
 }
 
 function getApiUrl(path: string, rootRelative?: string) {
@@ -35,7 +35,7 @@ function getApiUrl(path: string, rootRelative?: string) {
   });
 }
 
-export function Request<T>(request: RequestConfig<T>): Promise<RequestProps<T>> {
+export function Request<T>(request: RequestConfig<T>): Promise<Response<T>> {
   const formattedUrl = getApiUrl(request.url);
   const headers = {
     Accept: 'application/json',
@@ -61,7 +61,8 @@ export function Request<T>(request: RequestConfig<T>): Promise<RequestProps<T>> 
   return new Promise((resolve, reject) =>
     axios(requestConfig)
       .then((response: AxiosResponse) => {
-        resolve(response.data);
+        const { data } = response;
+        resolve(data);
       })
       .catch((error: AxiosError) => {
         reject(error);

@@ -3,5 +3,5 @@ export interface VehicleProps {
   brand: string;
   description?: string;
   price: string;
-  imageUrl?: string;
+  image_url?: string;
 }

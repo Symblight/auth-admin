@@ -5,16 +5,16 @@ export type TCar = {
   id: string | null;
   title: string;
   description?: string;
-  imageUrl: string;
   price?: string;
   passenger?: string;
   color?: string;
   year?: string;
-  carcase?: string;
+  category?: string;
   engine?: string;
   fuel?: string;
   bags?: string;
-  imagesUrl: string[];
+  image_url?: string;
+  images_url?: string[];
 };
 
 export type TPagination = {
@@ -24,8 +24,15 @@ export type TPagination = {
   lastPage: number;
 };
 
+export type TCategory = {
+  id: string;
+  title: string;
+  image_url?: string;
+};
+
 export interface CarsStoreProps {
   loading: boolean;
+  categories: TCategory[];
   vehicles: TCar[];
   pagination: TPagination;
   setCar: (value: TCar) => void;
@@ -35,12 +42,14 @@ export interface CarsStoreProps {
   setApiCar: (value: TCar) => void;
   getApiCars: (page: string | number) => void;
   getApiCar: (id: string) => void;
+  getCategories: () => void;
 }
 
 export function carsStore(): CarsStoreProps {
   return {
     vehicles: [] as TCar[],
     pagination: { page: 1 } as TPagination,
+    categories: [] as TCategory[],
     loading: true,
     setCar(value: TCar) {
       this.vehicles.push(value);
@@ -64,12 +73,11 @@ export function carsStore(): CarsStoreProps {
     async setApiCar(value: TCar) {
       try {
         this.loading = true;
-        const response = await Request<TCar>({
+        await Request<TCar>({
           method: 'POST',
           url: '/vehicle',
           data: { ...value },
         });
-        this.setCar(response);
         this.loading = false;
       } catch (error) {
         console.log(error);
@@ -78,14 +86,13 @@ export function carsStore(): CarsStoreProps {
     },
     async getApiCars(page: string | number) {
       try {
-        if (this.pagination.page !== Number(page) || _.isEmpty(this.vehicles)) {
-          const response = await Request<TCar[]>({
-            method: 'GET',
-            url: `/vehicles?page=${page || 1}`,
-          });
-          this.vehicles = response.data;
-          this.pagination = response;
-        }
+        const response = await Request<any>({
+          method: 'GET',
+          url: `/vehicles?page=${page || 1}`,
+        });
+
+        this.vehicles = [...response.data];
+        this.pagination = response;
         this.loading = false;
       } catch (error) {
         console.log(error);
@@ -100,7 +107,23 @@ export function carsStore(): CarsStoreProps {
           url: `/vehicle/${id}`,
         });
         this.loading = false;
-        return response;
+        return {
+          ...response,
+        };
+      } catch (error) {
+        this.loading = false;
+        console.log(error);
+      }
+    },
+    async getCategories() {
+      try {
+        this.loading = true;
+        const response = await Request<TCategory[]>({
+          method: 'GET',
+          url: `/categories`,
+        });
+        this.loading = false;
+        this.categories = [...response];
       } catch (error) {
         this.loading = false;
         console.log(error);

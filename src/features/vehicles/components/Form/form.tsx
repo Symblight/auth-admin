@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import _ from 'lodash';
-import { Input, DatePicker, Upload, message } from 'antd';
+import { Select, Input, DatePicker, Upload, message } from 'antd';
 import { UploadOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
-import { TCar } from 'stores';
+import { TCar, TCategory } from 'stores';
 
 import { Form } from './styled';
 
 const { YearPicker } = DatePicker;
+const { Option } = Select;
 
 const layout = {
   labelCol: { span: 8 },
@@ -18,13 +19,23 @@ const layout = {
 interface FormProps {
   submitButton: React.ReactNode;
   onSubmit: (values: TCar) => void;
-  data: TCar;
+  data: TCar | null;
+  categories: TCategory[];
+  lodaingCategories: boolean;
+  onFetchCategories: () => void;
 }
 
-const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
+const Index: React.FC<FormProps> = ({
+  submitButton,
+  onSubmit,
+  data,
+  categories,
+  lodaingCategories,
+  onFetchCategories,
+}) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImg] = useState(data ? data.imageUrl : '');
+  const [imageUrl, setImg] = useState(data ? data.image_url : '');
   const [album, setAlbums] = useState<string[]>([]);
 
   useEffect(() => {
@@ -41,20 +52,23 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
   }
 
   function getDefaultFiles(files: string[]): any {
-    return files.map((file: string) => ({
-      uid: _.uniqueId('files-'),
-      name: file,
-      status: 'done',
-      url: file,
-      thumbUrl: file,
-    }));
+    return (
+      files &&
+      files.map((file: string) => ({
+        uid: _.uniqueId('files-'),
+        name: file,
+        status: 'done',
+        url: file,
+        thumbUrl: file,
+      }))
+    );
   }
 
   const onFinish = (values: any) => {
     onSubmit({
       ...values,
-      imageUrl: values.imageUrl[0].response.path,
-      imagesUrl: getPhotosPath(values.imagesUrl),
+      image_url: values.image_url[0].response.path,
+      images_url: getPhotosPath(values.images_url),
     });
   };
 
@@ -119,7 +133,7 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
     <Form {...layout} form={form} name="add-car" onFinish={onFinish}>
       <Form.Item label="Картинка">
         <Form.Item
-          name="imageUrl"
+          name="image_url"
           valuePropName="fileList"
           getValueFromEvent={normFile}
           rules={[{ required: true, message: 'Укажите картинку' }]}
@@ -169,10 +183,21 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
       </Form.Item>
       <Form.Item
         label="Тип Кузова"
-        name="carcase"
+        name="category"
         rules={[{ required: true, message: 'Укажите кузов' }]}
       >
-        <Input placeholder="Тип Кузова" />
+        <Select
+          placeholder="Тип Кузова"
+          style={{ width: 120 }}
+          onFocus={onFetchCategories}
+          loading={lodaingCategories}
+        >
+          {categories.map((category: TCategory) => (
+            <Option key={category.title} value={category.id} title={category.title}>
+              {category.title}
+            </Option>
+          ))}
+        </Select>
       </Form.Item>
       <Form.Item
         label="Объем двигателя"
@@ -195,14 +220,14 @@ const Index: React.FC<FormProps> = ({ submitButton, onSubmit, data }) => {
       >
         <Input placeholder="Чемоданы" />
       </Form.Item>
-      <Form.Item label="Альбом" name="imagesUrl" valuePropName="fileListPhoto">
+      <Form.Item label="Альбом" name="images_url" valuePropName="fileListPhoto">
         <Upload
           name="file"
           action={window.config.apiURL + '/upload'}
           beforeUpload={beforeUpload}
           onChange={handleChangeAlbum}
           listType="picture-card"
-          defaultFileList={[...getDefaultFiles(data.imagesUrl)]}
+          defaultFileList={data && [...getDefaultFiles(data.images_url)]}
         >
           <UploadOutlined /> Upload
         </Upload>
