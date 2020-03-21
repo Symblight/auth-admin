@@ -1,21 +1,17 @@
 import url from 'url';
 import { join as joinPath } from 'path';
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError, AxiosPromise } from 'axios';
 
 type TMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS';
 
 const API_URL = window.config.apiURL;
 
-interface RequestConfig<T> {
+interface RequestConfig<Data> {
   url: string;
   header?: string[];
   unsetContentType?: boolean;
   method: TMethod;
-  data?: T;
-}
-
-interface Response<T> {
-  data?: T;
+  data?: Data;
 }
 
 function getApiUrl(path: string, rootRelative?: string) {
@@ -35,7 +31,7 @@ function getApiUrl(path: string, rootRelative?: string) {
   });
 }
 
-export function Request<T>(request: RequestConfig<T>): Promise<Response<T>> {
+export function Request<T = unknown, Data = unknown>(request: RequestConfig<Data>): Promise<T> {
   const formattedUrl = getApiUrl(request.url);
   const headers = {
     Accept: 'application/json',
@@ -60,7 +56,7 @@ export function Request<T>(request: RequestConfig<T>): Promise<Response<T>> {
 
   return new Promise((resolve, reject) =>
     axios(requestConfig)
-      .then((response: AxiosResponse) => {
+      .then((response: AxiosResponse<T>) => {
         const { data } = response;
         resolve(data);
       })

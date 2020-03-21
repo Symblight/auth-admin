@@ -14,16 +14,11 @@ export function App() {
   const session = useSession();
   const loading = useSessionFetch();
 
-  const routes = useMemo(
-    () => protectedRoutes(ROUTES, { root: 'DEV', auth: false, token: null }),
-    [],
-  );
+  const routes = useMemo(() => protectedRoutes(ROUTES, { root: 'DEV', auth: false }), []);
 
   if (loading) {
     return <div>Loading</div>;
   }
-
-  console.log(loading, session);
 
   return (
     <>

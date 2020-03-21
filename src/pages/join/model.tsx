@@ -1,23 +1,27 @@
-import React from 'react';
+import { createStore, createEffect, combine } from 'effector';
 
-import { RouteComponentProps, RouteProps } from 'react-router-dom';
-import { observer } from 'mobx-react';
+import { Request } from 'libs/api';
+import { createFetching } from 'features/common';
 
-import { useStores } from 'components';
-import { TStore } from 'stores';
+type TLogin = {
+  email: string;
+  password: string;
+};
 
-import { Page, Value } from './page';
+export const fetchLogin = createEffect<TLogin, void, any>();
 
-interface PageProps extends RouteComponentProps {
-  routes: RouteProps[];
-}
+export const $isLoading = createStore(false);
+export const $isError = createStore<Error>(new Error(''));
 
-export const JoinPage: React.FC<PageProps> = observer(({ ...props }) => {
-  const { auth } = useStores<TStore>();
+$isLoading
+  .reset(fetchLogin)
+  .on(fetchLogin, () => true)
+  .on(fetchLogin.finally, () => false);
 
-  function handleLogin(value: Value) {
-    auth.checkLogin();
-  }
+$isError.reset(fetchLogin).on(fetchLogin.fail, (_, { error }) => error);
 
-  return <Page {...props} onLogin={handleLogin} />;
+export const $status = combine($isLoading, $isError, (loading, error) => ({ loading, error }));
+
+fetchLogin.use(async data => {
+  await Request<any>({ method: 'POST', url: '/login', data });
 });

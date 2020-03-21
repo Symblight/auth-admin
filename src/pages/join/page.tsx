@@ -1,10 +1,15 @@
 import React from 'react';
+import { useStore } from 'effector-react';
 
 import { RouteComponentProps, RouteProps } from 'react-router-dom';
 import { Form, Input, Button } from 'antd';
+import { useAlert } from 'react-alert';
+import { RouteWithSubRoutes, ExternalRouteProps } from 'libs/routes';
 import { FormTemplate } from 'containers';
 
 import { Wrapper } from './styled';
+
+import { fetchLogin, $status } from './model';
 
 export type Value = {
   email: string;
@@ -16,12 +21,21 @@ interface PageProps extends RouteComponentProps {
   onLogin: (values: Value) => void;
 }
 
-export const Page: React.FC<PageProps> = ({ onLogin }) => {
+export const Page: React.FC<PageProps> = () => {
   const [form] = Form.useForm();
+  const alert = useAlert();
+  const status = useStore($status);
 
   const onFinish = (values: any) => {
-    onLogin(values);
+    fetchLogin(values);
   };
+
+  React.useEffect(() => {
+    const { message } = status.error;
+    if (message !== '') {
+      alert.error(message);
+    }
+  }, [status.error, alert]);
 
   return (
     <FormTemplate>

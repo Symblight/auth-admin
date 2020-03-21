@@ -1,30 +1,49 @@
-import { createEffect, createStore, guard, createEvent, Effect } from 'effector';
+import { createEffect, createStore, guard, createEvent } from 'effector';
 import { Request } from 'libs/api';
 
-export const $isLoading = createStore(false);
-export const $session = createStore(null);
-export const $error = createStore('');
+export const $isLoading = createStore(true);
+export const $error = createStore<Error | null>(null);
+
+/**
+ * @summary user data (email, role, username)
+ */
+export const $session = createStore<User | null>(null);
+
+/**
+ * @summary This is a user authentication request.
+ */
 export const fetchSession = createEvent();
 
-export const getProfile = createEffect<Effect<void, void, void>>('get profile');
+type LoginData = {
+  email: string;
+  password: string;
+};
+
+type User = {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+};
+
+/**
+ * @param LoginData - input data
+ * @param User - output data
+ */
+
+export const getProfile = createEffect<LoginData | void, User>('getProfile'); // any return from Request type
 export const logout = createEffect('logout');
 
-getProfile.use(async data => await Request({ url: '/login', method: 'GET', data }));
+getProfile.use(
+  async () => await Request<User>({ url: '/login', method: 'GET' }),
+);
 logout.use(async () => await Request({ url: '/login', method: 'DELETE' }));
 
-$isLoading
-  .on(getProfile, () => true)
-  .on(getProfile.done, () => false)
-  .on(getProfile.fail, () => false);
+$isLoading.on(getProfile, () => true).on(getProfile.finally, () => false);
 
-$error.on(getProfile.fail, (_, { result }) => result);
+$error
+  .reset(getProfile)
+  .reset(getProfile.done)
+  .on(getProfile.fail, (_, { error }) => error);
 
 $session.on(getProfile.done, (_, { result }) => result).on(getProfile.fail, () => null);
-
-guard({
-  source: fetchSession,
-  filter: getProfile.pending.map(data => !data),
-  target: getProfile,
-});
-
-getProfile.fail.watch(() => console.error('fail'));
