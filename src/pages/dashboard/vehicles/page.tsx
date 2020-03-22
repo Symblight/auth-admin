@@ -34,7 +34,6 @@ export const VehiclesPage: React.FC<PageProps> = () => {
       const { message } = statusRemove.error;
       alert.error(message);
     }
-    console.log(statusRemove.error);
   }, [statusRemove, alert]);
 
   function handleDelete(id: string) {

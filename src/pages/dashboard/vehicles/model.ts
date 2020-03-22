@@ -29,7 +29,7 @@ interface TResponseVehicles extends TPagination {
   data: TCar[];
 }
 
-const $vehicles = createStore<TResponseVehicles | null>(null);
+const $vehicles = createStore<TResponseVehicles>({} as TResponseVehicles);
 
 export const submitDelete = createEvent<number | string>();
 export const getVehiclesByPage = createEvent<string>();
@@ -50,7 +50,15 @@ getVehicles.use(
   async (page: string) => await Request({ url: `/vehicles?page=${page || 1}`, method: 'GET' }),
 );
 
-$vehicles.on(getVehicles.done, (_, { result }) => result);
+$vehicles
+  .on(getVehicles.done, (_, { result }) => result)
+  .on(fetchDelete.done, (state, { params }) => {
+    const updated = state.data.filter(item => item.id !== params);
+    return {
+      ...state,
+      data: updated,
+    };
+  });
 
 pageMounted.watch((id: string) => {
   getVehiclesByPage(id);
