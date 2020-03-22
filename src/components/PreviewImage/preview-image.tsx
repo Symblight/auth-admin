@@ -33,7 +33,7 @@ const Image = styled(Link)`
 `;
 
 export const PreviewImage: React.FC<ImageUrl> = ({ url }) => {
-  const params = useParams(url.search);
+  const params = useParams();
 
   return (
     <Image

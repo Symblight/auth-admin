@@ -27,12 +27,11 @@ createSession.use(
   async () => await Request<User>({ url: '/login', method: 'GET' }),
 );
 
-dropSession.use(
-  async () => await Request<void | Promise<void>>({ url: '/login', method: 'DELETE' }),
-);
+dropSession.use(async () => await Request({ url: '/login', method: 'DELETE' }));
 
 fetchLogin.use(
-  async (data: LoginData) => await Request<User>({ url: '/login', method: 'POST', data }),
+  async (data: LoginData) =>
+    await Request<LoginData, User>({ url: '/login', method: 'POST', data }),
 );
 
 $isLoading.on(createSession, () => true).on(createSession.finally, () => false);

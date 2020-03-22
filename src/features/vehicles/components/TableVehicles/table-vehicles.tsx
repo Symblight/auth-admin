@@ -13,7 +13,7 @@ export interface TableVehicleProps {
   match: string;
   onDelete: (value: string) => void;
   source: TCar[];
-  pagination: TPagination;
+  pagination: TPagination | null;
   loading: boolean;
   search: string;
 }

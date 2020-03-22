@@ -1,6 +1,5 @@
 import { RouteComponentProps } from 'react-router-dom';
-
-import { redirectTo } from './routes';
+import { history } from 'libs/history';
 
 export type ExternalRouteProps<Ctx = any> = {
   path?: string;
@@ -31,7 +30,7 @@ export type Guard<Ctx> = (
 ) => ExternalRouteProps<Ctx> | null | void;
 
 function next(to: string) {
-  return to;
+  return history.push(to);
 }
 
 function compileRoute<C>(route: Route<C>, context: C): Route<C> | null {
@@ -41,9 +40,7 @@ function compileRoute<C>(route: Route<C>, context: C): Route<C> | null {
     guards.map(guard => {
       const res = guard(route, context, next);
 
-      if (compileRoutes !== null && typeof res === 'string') {
-        compileRoutes.component = redirectTo.bind(null, { to: res });
-      } else if (typeof res === 'object') {
+      if (typeof res === 'object') {
         compileRoutes = res;
       }
     });
