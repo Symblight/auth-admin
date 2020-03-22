@@ -8,13 +8,13 @@ export type UserSession = {
 };
 
 export function onlyFor(roots: Roles[]): Guard<UserSession> {
-  return (route, ctx, next) => (ctx && ctx.auth && roots.includes(ctx.root) ? route : next('/'));
+  return (route, ctx, next) => (ctx && ctx.auth && roots.includes(ctx.root) ? route : next('/d'));
 }
 
 export function onlyAuth(): Guard<UserSession> {
-  return (route, ctx, next) => (ctx && ctx.auth ? route : next('/signin'));
+  return (route, ctx, next) => (ctx && ctx.auth ? route : next('/'));
 }
 
 export function onlyAnon(): Guard<UserSession> {
-  return (route, ctx, next) => (ctx && ctx.auth ? next('/') : route);
+  return (route, ctx, next) => (ctx && ctx.auth ? next('/d') : route);
 }

@@ -10,21 +10,28 @@ import {
   AddVehiclePage,
   EditVehiclePage,
   VehicleViewPage,
+  LogoutPage,
 } from 'pages';
 
-export const ROUTES = [
+import { onlyAuth, onlyAnon } from 'features/common';
+import { Route } from 'libs/routes';
+
+export const ROUTES: Route<any>[] = [
   {
     path: '/d',
     component: DashboardPage,
+    guards: [onlyAuth()],
     routes: [
       {
         path: '/d',
         exact: true,
         component: VehiclesPage,
+        guards: [onlyAuth()],
       },
       {
         path: '/d/v/',
         component: VehicleViewPage,
+        guards: [onlyAuth()],
         routes: [
           {
             path: '/d/v/:id',
@@ -59,11 +66,19 @@ export const ROUTES = [
     path: '/',
     exact: true,
     component: JoinPage,
+    guards: [onlyAnon()],
   },
   {
     path: '/profile',
     exact: true,
     component: ProfilePage,
+    guards: [onlyAuth()],
+  },
+  {
+    path: '/sign_out',
+    exact: true,
+    component: LogoutPage,
+    guards: [onlyAuth()],
   },
   { component: NotFoundPage },
 ];

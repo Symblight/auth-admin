@@ -6,24 +6,22 @@ import { RouteWithSubRoutes, protectedRoutes } from 'libs/routes';
 
 import { ROUTES } from 'pages/routes';
 import { GlobalStyles } from './global-styles';
-import { useSession, useSessionFetch } from 'features/common';
+import { useSessionWaiting, useSession, useSessionFetch } from 'features/common';
 
 import 'antd/dist/antd.css';
 
 export function App() {
+  useSessionFetch();
   const session = useSession();
-  const loading = useSessionFetch();
+  const waiting = useSessionWaiting();
 
-  const routes = useMemo(
-    () => protectedRoutes(ROUTES, { root: 'DEV', auth: false, token: null }),
-    [],
-  );
+  const routes = useMemo(() => protectedRoutes(ROUTES, { root: 'DEV', auth: !!session }), [
+    session,
+  ]);
 
-  if (loading) {
+  if (waiting) {
     return <div>Loading</div>;
   }
-
-  console.log(loading, session);
 
   return (
     <>

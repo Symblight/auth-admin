@@ -1,1 +1,1 @@
-export { JoinPage } from './model';
+export { Page as JoinPage } from './page';

@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
           </Menu.Item>
           <Menu.Item key="1">
             Выйти
-            <Link to="/" />
+            <Link to="/sign_out" />
           </Menu.Item>
         </MenuUser>
       </Menu>

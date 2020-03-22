@@ -4,19 +4,18 @@ import { Router } from 'react-router-dom';
 
 import { App } from './app';
 
-import createHistory from './stores/history';
+import { history } from 'libs/history';
 import { authStore as auth, carsStore as cars } from 'stores';
-import { StoreProvider } from 'components';
-
-const history = createHistory();
+import { AlertProvider, StoreProvider } from 'components';
 
 const root = document.querySelector('#root');
-
 function render(): void {
   ReactDOM.render(
     <Router history={history}>
       <StoreProvider stores={{ auth, cars }}>
-        <App />
+        <AlertProvider>
+          <App />
+        </AlertProvider>
       </StoreProvider>
     </Router>,
     root,

@@ -1,30 +1,51 @@
-import { createEffect, createStore, guard, createEvent, Effect } from 'effector';
+import { createEffect, createStore } from 'effector';
 import { Request } from 'libs/api';
 
-export const $isLoading = createStore(false);
-export const $session = createStore(null);
-export const $error = createStore('');
-export const fetchSession = createEvent();
+export const $isLoading = createStore(true);
+export const $error = createStore<Error | null>(null);
 
-export const getProfile = createEffect<Effect<void, void, void>>('get profile');
-export const logout = createEffect('logout');
+export const $session = createStore<User | null>(null);
 
-getProfile.use(async data => await Request({ url: '/login', method: 'GET', data }));
-logout.use(async () => await Request({ url: '/login', method: 'DELETE' }));
+type LoginData = {
+  email: string;
+  password: string;
+};
 
-$isLoading
-  .on(getProfile, () => true)
-  .on(getProfile.done, () => false)
-  .on(getProfile.fail, () => false);
+export type User = {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+};
 
-$error.on(getProfile.fail, (_, { result }) => result);
+export const createSession = createEffect<LoginData | void, User>('createSession');
+export const dropSession = createEffect<void, void>();
 
-$session.on(getProfile.done, (_, { result }) => result).on(getProfile.fail, () => null);
+export const fetchLogin = createEffect<LoginData, User>('fetchLogin');
 
-guard({
-  source: fetchSession,
-  filter: getProfile.pending.map(data => !data),
-  target: getProfile,
-});
+createSession.use(
+  async () => await Request<User>({ url: '/login', method: 'GET' }),
+);
 
-getProfile.fail.watch(() => console.error('fail'));
+dropSession.use(
+  async () => await Request<void | Promise<void>>({ url: '/login', method: 'DELETE' }),
+);
+
+fetchLogin.use(
+  async (data: LoginData) => await Request<User>({ url: '/login', method: 'POST', data }),
+);
+
+$isLoading.on(createSession, () => true).on(createSession.finally, () => false);
+
+$error
+  .reset(createSession)
+  .reset(createSession.done)
+  .on(createSession.fail, (_, { error }) => error);
+
+$session
+  .reset(createSession)
+  .reset(createSession.fail)
+  .on(createSession.fail, () => null)
+  .on(fetchLogin.done, (_, { result }) => result)
+  .on(createSession.done, (_, { result }) => result)
+  .on(dropSession.done, () => null);

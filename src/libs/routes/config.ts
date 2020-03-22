@@ -1,32 +1,42 @@
-import { RouteProps, RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 
 import { redirectTo } from './routes';
 
-export interface CustomRouteProps<Ctx> extends RouteProps {
-  routes?: RouteProps[];
-  guards?: Guard<Ctx>[];
+export type ExternalRouteProps<Ctx = any> = {
+  path?: string;
+  routes?: Route<Ctx>[];
   name?: string;
-  Component?: React.ComponentType<RouteComponentProps<any>> | React.ComponentType<any>;
-}
+  component: React.ComponentType<RouteComponentProps> | React.ComponentType<any>;
+  guards?: Guard<Ctx>[];
+};
 
+export type SimpleRoute<Context> = {
+  name?: string;
+  path?: string;
+  exact?: boolean;
+  component: React.ComponentType<RouteComponentProps> | React.ComponentType<any>;
+  guards?: Guard<Context>[];
+};
+
+export type Route<Context> = SimpleRoute<Context> | ExternalRouteProps<Context>;
 export interface CustomProps {
-  component?: any;
-  props: any;
+  component?: unknown;
+  props: unknown;
 }
 
 export type Guard<Ctx> = (
-  route: CustomRouteProps<Ctx>,
+  route: ExternalRouteProps<Ctx>,
   context: Ctx,
   next: (to: string) => void,
-) => CustomRouteProps<Ctx> | null | void;
+) => ExternalRouteProps<Ctx> | null | void;
 
 function next(to: string) {
   return to;
 }
 
-function compileRoute<C>(route: CustomRouteProps<C>, context: C): CustomRouteProps<C> | null {
+function compileRoute<C>(route: Route<C>, context: C): Route<C> | null {
   const { guards } = route;
-  let compileRoutes: CustomRouteProps<C> | null = { ...route };
+  let compileRoutes: Route<C> | null = { ...route };
   if (guards) {
     guards.map(guard => {
       const res = guard(route, context, next);
@@ -41,6 +51,6 @@ function compileRoute<C>(route: CustomRouteProps<C>, context: C): CustomRoutePro
   return compileRoutes;
 }
 
-export function protectedRoutes<C>(routes: CustomRouteProps<C>[], context: C) {
+export function protectedRoutes<C>(routes: Route<C>[], context: C) {
   return routes.map(route => compileRoute(route, context)).filter(Boolean);
 }
