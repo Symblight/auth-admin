@@ -16,5 +16,5 @@ export function onlyAuth(): Guard<UserSession> {
 }
 
 export function onlyAnon(): Guard<UserSession> {
-  return (route, ctx, next) => (ctx && ctx.auth ? next('/') : route);
+  return (route, ctx, next) => (ctx && ctx.auth ? next('/d') : route);
 }

@@ -10,6 +10,7 @@ import {
   AddVehiclePage,
   EditVehiclePage,
   VehicleViewPage,
+  LogoutPage,
 } from 'pages';
 
 import { onlyAuth, onlyAnon } from 'features/common';
@@ -71,6 +72,12 @@ export const ROUTES: Route<any>[] = [
     path: '/profile',
     exact: true,
     component: ProfilePage,
+    guards: [onlyAuth()],
+  },
+  {
+    path: '/sign_out',
+    exact: true,
+    component: LogoutPage,
     guards: [onlyAuth()],
   },
   { component: NotFoundPage },

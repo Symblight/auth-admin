@@ -1,17 +1,12 @@
-import { createStore, createEffect, combine } from 'effector';
+import { createStore, combine } from 'effector';
 
-import { Request } from 'libs/api';
-import { createFetching } from 'features/common';
-
-type TLogin = {
-  email: string;
-  password: string;
-};
-
-export const fetchLogin = createEffect<TLogin, void, any>();
+import { history } from 'libs/history';
+import { fetchLogin } from 'features/common';
 
 export const $isLoading = createStore(false);
-export const $isError = createStore<Error>(new Error(''));
+export const $isError = createStore({
+  message: '',
+});
 
 $isLoading
   .reset(fetchLogin)
@@ -22,6 +17,4 @@ $isError.reset(fetchLogin).on(fetchLogin.fail, (_, { error }) => error);
 
 export const $status = combine($isLoading, $isError, (loading, error) => ({ loading, error }));
 
-fetchLogin.use(async data => {
-  await Request<any>({ method: 'POST', url: '/login', data });
-});
+fetchLogin.done.watch(() => history.push('/d'));

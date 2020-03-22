@@ -31,7 +31,7 @@ function getApiUrl(path: string, rootRelative?: string) {
   });
 }
 
-export function Request<T = unknown, Data = unknown>(request: RequestConfig<Data>): Promise<T> {
+export function Request<T, Data = any>(request: RequestConfig<Data>): Promise<T> {
   const formattedUrl = getApiUrl(request.url);
   const headers = {
     Accept: 'application/json',

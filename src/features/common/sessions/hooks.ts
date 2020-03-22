@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useStore } from 'effector-react';
-import { getProfile, $session, $isLoading } from './model';
+import { createSession, $session, $isLoading } from './model';
 
 export function useSession() {
   return useStore($session);
@@ -8,8 +8,10 @@ export function useSession() {
 
 export function useSessionFetch() {
   useEffect(() => {
-    getProfile();
+    createSession();
   }, []);
+}
 
+export function useSessionWaiting() {
   return useStore($isLoading);
 }

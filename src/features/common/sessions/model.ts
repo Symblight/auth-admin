@@ -1,49 +1,51 @@
-import { createEffect, createStore, guard, createEvent } from 'effector';
+import { createEffect, createStore } from 'effector';
 import { Request } from 'libs/api';
 
 export const $isLoading = createStore(true);
 export const $error = createStore<Error | null>(null);
 
-/**
- * @summary user data (email, role, username)
- */
 export const $session = createStore<User | null>(null);
-
-/**
- * @summary This is a user authentication request.
- */
-export const fetchSession = createEvent();
 
 type LoginData = {
   email: string;
   password: string;
 };
 
-type User = {
+export type User = {
   id: number;
   username: string;
   email: string;
   role: string;
 };
 
-/**
- * @param LoginData - input data
- * @param User - output data
- */
+export const createSession = createEffect<LoginData | void, User>('createSession');
+export const dropSession = createEffect<void, void>();
 
-export const getProfile = createEffect<LoginData | void, User>('getProfile'); // any return from Request type
-export const logout = createEffect('logout');
+export const fetchLogin = createEffect<LoginData, User>('fetchLogin');
 
-getProfile.use(
+createSession.use(
   async () => await Request<User>({ url: '/login', method: 'GET' }),
 );
-logout.use(async () => await Request({ url: '/login', method: 'DELETE' }));
 
-$isLoading.on(getProfile, () => true).on(getProfile.finally, () => false);
+dropSession.use(
+  async () => await Request<void | Promise<void>>({ url: '/login', method: 'DELETE' }),
+);
+
+fetchLogin.use(
+  async (data: LoginData) => await Request<User>({ url: '/login', method: 'POST', data }),
+);
+
+$isLoading.on(createSession, () => true).on(createSession.finally, () => false);
 
 $error
-  .reset(getProfile)
-  .reset(getProfile.done)
-  .on(getProfile.fail, (_, { error }) => error);
+  .reset(createSession)
+  .reset(createSession.done)
+  .on(createSession.fail, (_, { error }) => error);
 
-$session.on(getProfile.done, (_, { result }) => result).on(getProfile.fail, () => null);
+$session
+  .reset(createSession)
+  .reset(createSession.fail)
+  .on(createSession.fail, () => null)
+  .on(fetchLogin.done, (_, { result }) => result)
+  .on(createSession.done, (_, { result }) => result)
+  .on(dropSession.done, () => null);

@@ -4,12 +4,12 @@ import { useStore } from 'effector-react';
 import { RouteComponentProps, RouteProps } from 'react-router-dom';
 import { Form, Input, Button } from 'antd';
 import { useAlert } from 'react-alert';
-import { RouteWithSubRoutes, ExternalRouteProps } from 'libs/routes';
 import { FormTemplate } from 'containers';
 
 import { Wrapper } from './styled';
 
-import { fetchLogin, $status } from './model';
+import { $status } from './model';
+import { fetchLogin } from 'features/common';
 
 export type Value = {
   email: string;
@@ -54,7 +54,7 @@ export const Page: React.FC<PageProps> = () => {
           >
             <Input type="password" placeholder="Password" />
           </Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button loading={status.loading} type="primary" htmlType="submit">
             Log in
           </Button>
         </Form>
