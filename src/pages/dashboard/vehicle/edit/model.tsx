@@ -1,55 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import _ from 'lodash';
+import { createStore, createEffect, createEvent, combine, guard } from 'effector';
 
-import { RouteComponentProps, RouteProps, useRouteMatch } from 'react-router-dom';
-import { observer } from 'mobx-react';
+import { createFetching } from 'features/common';
+import { TCar, TCategory } from 'features/vehicles';
+import { Request } from 'libs/api';
+import { history } from 'libs/history';
 
-import { useStores } from 'components';
-import { TStore, TCar, TCategory } from 'stores';
+export const pageMounted = createEvent<string>();
+export const pageUnmounted = createEvent();
+const getVehicleById = createEvent<string>();
 
-import { Page } from './page';
+export const $vehicle = createStore<TCar>({} as TCar);
+export const $categories = createStore<TCategory[]>([] as TCategory[]);
 
-interface PageProps extends RouteComponentProps {
-  routes: RouteProps[];
-}
+const getVehicel = createEffect<string, TCar, Error>();
+export const getCategories = createEffect<void, TCategory[], Error>();
+export const submitFormVehicle = createEffect<TCar, TCar, Error>();
 
-export const EditVehiclePage: React.FC<PageProps> = observer(({ ...props }) => {
-  const [data, setData] = useState<TCar>({});
-  const [lodaingCategories, setLoadingCategories] = useState(false);
-  const match = useRouteMatch<{ id: string }>();
-  const { cars } = useStores<TStore>();
+getVehicel.use(
+  async (id: string) =>
+    await Request({
+      method: 'GET',
+      url: `/vehicle/${id}`,
+    }),
+);
 
-  async function handleFetch() {
-    try {
-      const car = await cars.getCar(match.params.id);
-      setData(car);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+getCategories.use(
+  async () =>
+    await Request({
+      method: 'GET',
+      url: `/categories`,
+    }),
+);
 
-  useEffect(() => {
-    handleFetch();
-  }, []);
+submitFormVehicle.use(
+  async (data: TCar) =>
+    await Request({
+      method: 'PUT',
+      url: `/vehicle/${data.id}`,
+      data,
+    }),
+);
 
-  async function handleFetchCategories() {
-    try {
-      setLoadingCategories(true);
-      await cars.getCategories();
-      setLoadingCategories(false);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  return (
-    <Page
-      {...props}
-      data={data}
-      loading={_.isEmpty(data)}
-      categories={cars.categories}
-      lodaingCategories={lodaingCategories}
-      onFetchCategories={handleFetchCategories}
-    />
-  );
+const fetchingVehicle = createFetching<string, TCar, Error, void>(getVehicel, {
+  reset: pageUnmounted,
 });
+const fetchingCategories = createFetching<void, TCategory[], Error, void>(getCategories, {
+  reset: pageUnmounted,
+});
+const fetchingSubmitVehicle = createFetching<TCar, TCar, Error, void>(submitFormVehicle, {
+  reset: pageUnmounted,
+});
+
+$vehicle.on(getVehicel.done, (_, { result }) => result);
+$categories.on(getCategories.done, (state, { result }) => {
+  if (state.length === 0) {
+    return result;
+  }
+});
+
+guard({
+  source: getVehicleById,
+  filter: id => id !== null,
+  target: getVehicel,
+});
+
+pageMounted.watch((id: string) => {
+  getVehicleById(id);
+  getCategories();
+});
+
+submitFormVehicle.done.watch(() => history.push('/d'));
+
+export const $isLoading = combine(fetchingSubmitVehicle.isFetching, submitLoading => ({
+  submitLoading,
+}));
+
+export const $error = combine(
+  fetchingVehicle.error,
+  fetchingCategories.error,
+  fetchingSubmitVehicle.error,
+  (errorVehicle, errorCategories, submitError) => {
+    if (errorVehicle) return errorVehicle;
+    if (errorCategories) return errorCategories;
+    if (submitError) return submitError;
+    return null;
+  },
+);
+$vehicle.reset(pageUnmounted);
+$categories.reset(pageUnmounted);
