@@ -1,6 +1,6 @@
 export function useParams() {
-  function parse(variable: string): string {
-    const query = window.location.search.substring(1);
+  function parse(variable: string, targetUrl?: string): string {
+    const query = targetUrl || window.location.search.substring(1);
     const vars = query.split('&');
     let value = undefined;
     vars.forEach(item => {
@@ -13,8 +13,8 @@ export function useParams() {
     return value || '1';
   }
 
-  function removeParams(param: string) {
-    const url = window.location.search;
+  function removeParams(param: string, targetUrl?: string) {
+    const url = targetUrl || window.location.search;
     const query = url.substring(1);
     const vars = query.split('&');
 

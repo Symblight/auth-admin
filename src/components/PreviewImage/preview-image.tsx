@@ -37,10 +37,10 @@ export const PreviewImage: React.FC<ImageUrl> = ({ url }) => {
 
   return (
     <Image
-      uri={params.parse('photo') || '#'}
+      uri={params.parse('photo', url.search) || '#'}
       to={{
         pathname: url.path,
-        search: `${params.removeParams('photo')}photo=${params.parse('photo')}`,
+        search: `${params.removeParams('photo')}photo=${params.parse('photo', url.search)}`,
       }}
     />
   );

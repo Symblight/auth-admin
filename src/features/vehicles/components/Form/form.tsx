@@ -38,8 +38,6 @@ const Index: React.FC<FormProps> = ({
   const [imageUrl, setImg] = useState(data ? data.image_url : '');
   const [album, setAlbums] = useState<string[]>([]);
 
-  console.log(imageUrl);
-
   function getDefaultFiles(files: string[]): any {
     return (
       files &&
@@ -239,7 +237,7 @@ const Index: React.FC<FormProps> = ({
           beforeUpload={beforeUpload}
           onChange={handleChangeAlbum}
           listType="picture-card"
-          defaultFileList={[...getDefaultFiles(data.images_url)]}
+          defaultFileList={data ? [...getDefaultFiles(data.images_url)] : []}
         >
           <UploadOutlined /> Upload
         </Upload>
