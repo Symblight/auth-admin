@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { TPagination } from 'stores';
 
 export interface PaginationProps {
-  pagination: TPagination;
+  pagination: TPagination | null;
 }
 
 export const Pagination: React.FC<PaginationProps> = ({ pagination }) => {
@@ -21,7 +21,7 @@ export const Pagination: React.FC<PaginationProps> = ({ pagination }) => {
     }
     return originalElement;
   }
-  if (pagination.total === undefined) return null;
+  if (pagination === null || pagination.total === undefined) return null;
 
   return (
     <PaginationAntd

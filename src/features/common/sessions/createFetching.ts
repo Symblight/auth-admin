@@ -1,25 +1,48 @@
-import { createEvent, createStore, Effect } from 'effector';
+import { createStore, createEvent, Effect, Event } from 'effector';
 
 type TFetching = 'initial' | 'loading' | 'done' | 'failed' | 'attempt';
 
-export function createFetching<Params = unknown, Done = unknown, Fail = unknown>(
-  effect: Effect<Params, Done, Error>,
+type ErrorMessage = {
+  [key: string]: any;
+  message: string;
+};
+
+type Params<R, E, Rs> = {
+  result?: R;
+  error?: E;
+  reset?: Event<Rs>;
+};
+
+export function createFetching<Pr = unknown, Done = unknown, Fail = ErrorMessage, Reset = string>(
+  effect: Effect<Pr, Done, Fail>,
+  params?: Params<Done, Fail, Reset>,
 ) {
-  const reset = createEvent();
   const $fetching = createStore<TFetching>('initial');
-  const $error = createStore<null>(null);
+  const $error = createStore<Fail | null>(null);
+  const $result = createStore<Done | null>(null);
+  const customReset = (params && params.reset) || createEvent<Reset>();
 
   $fetching
     .on(effect, () => 'loading')
     .on(effect.done, () => 'done')
-    .on(effect.fail, () => 'failed');
+    .on(effect.fail, () => 'failed')
+    .reset(customReset);
 
-  $error.on(effect.fail, (_, { error }) => error);
+  $result
+    .reset(effect)
+    .reset(effect.fail)
+    .reset(customReset)
+    .on(effect.done, (_, { result }) => result);
+
+  $error
+    .reset(effect)
+    .reset(effect.done)
+    .reset(customReset)
+    .on(effect.fail, (_, { error }) => error);
 
   const isFail = $fetching.map(state => state === 'failed');
   const isDone = $fetching.map(state => state === 'done');
   const isFetching = $fetching.map(state => state === 'loading');
-  const isAttempt = $fetching.map(state => state !== 'initial');
 
-  return { isFail, isDone, isFetching, isAttempt, error: $error };
+  return { isFail, isDone, isFetching, error: $error, result: $result };
 }

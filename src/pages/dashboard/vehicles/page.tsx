@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 
 import { RouteComponentProps, RouteProps, useLocation, useRouteMatch } from 'react-router-dom';
-import { useObserver } from 'mobx-react';
+import { useStore } from 'effector-react';
+import { useAlert } from 'react-alert';
 
-import { TStore } from 'stores';
-
-import { useStores, PageHeader } from 'components';
+import { PageHeader } from 'components';
 import { TableVehicle } from 'features/vehicles';
 import { useParams } from 'libs/useParams';
+
+import { submitDelete, $status, pageMounted, $result } from './model';
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
@@ -15,31 +16,41 @@ interface PageProps extends RouteComponentProps {
 
 export const VehiclesPage: React.FC<PageProps> = () => {
   const location = useLocation();
-  const parseParams = useParams(location.search);
-  const { cars } = useStores<TStore>();
+  const { parse } = useParams();
+  const alert = useAlert();
+
+  const statusRemove = useStore($status);
+  const { vehicles, status } = useStore($result);
+
   const match = useRouteMatch();
+  const page = parse('page');
 
   useEffect(() => {
-    cars.getApiCars(parseParams.parse('page') || 1);
-  }, [location, match]);
+    pageMounted(page);
+  }, [page]);
+
+  useEffect(() => {
+    if (statusRemove.error) {
+      const { message } = statusRemove.error;
+      alert.error(message);
+    }
+  }, [statusRemove, alert]);
 
   function handleDelete(id: string) {
-    console.log(id);
+    submitDelete(id);
   }
 
   return (
     <>
       <PageHeader title="Автомобили" to="/d/v/new/car" buttonText="Добавить машину" />
-      {useObserver(() => (
-        <TableVehicle
-          match={match.path}
-          search={location.search}
-          source={cars.vehicles}
-          pagination={cars.pagination}
-          onDelete={handleDelete}
-          loading={cars.loading}
-        />
-      ))}
+      <TableVehicle
+        match={match.path}
+        search={location.search}
+        source={vehicles ? vehicles.data : []}
+        pagination={vehicles}
+        onDelete={handleDelete}
+        loading={status.loading}
+      />
     </>
   );
 };

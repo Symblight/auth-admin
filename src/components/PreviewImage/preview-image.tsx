@@ -33,14 +33,14 @@ const Image = styled(Link)`
 `;
 
 export const PreviewImage: React.FC<ImageUrl> = ({ url }) => {
-  const params = useParams(url.search);
+  const params = useParams();
 
   return (
     <Image
-      uri={params.parse('photo') || '#'}
+      uri={params.parse('photo', url.search) || '#'}
       to={{
         pathname: url.path,
-        search: `${params.removeParams('photo')}photo=${params.parse('photo')}`,
+        search: `${params.removeParams('photo')}photo=${params.parse('photo', url.search)}`,
       }}
     />
   );

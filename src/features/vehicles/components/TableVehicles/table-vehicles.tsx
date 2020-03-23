@@ -13,7 +13,7 @@ export interface TableVehicleProps {
   match: string;
   onDelete: (value: string) => void;
   source: TCar[];
-  pagination: TPagination;
+  pagination: TPagination | null;
   loading: boolean;
   search: string;
 }
@@ -54,9 +54,9 @@ export const TableVehicle: React.FC<TableVehicleProps> = ({
       title: 'Фото',
       dataIndex: 'image_url',
       key: 'image',
-      render: (text: string) => (
-        <PreviewImage url={{ path: match, search: `${search}&photo=${text}` }} />
-      ),
+      render: (text: string) => {
+        return <PreviewImage url={{ path: match, search: `${search}&photo=${text}` }} />;
+      },
     },
     {
       title: 'Цена',

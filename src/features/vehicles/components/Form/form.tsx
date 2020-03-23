@@ -38,19 +38,6 @@ const Index: React.FC<FormProps> = ({
   const [imageUrl, setImg] = useState(data ? data.image_url : '');
   const [album, setAlbums] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (data) {
-      form.setFieldsValue({
-        ...data,
-        year: moment(data.year),
-      });
-    }
-  }, [form, data]);
-
-  function getPhotosPath(values: any) {
-    return values.fileList.map((item: any) => item.response.path);
-  }
-
   function getDefaultFiles(files: string[]): any {
     return (
       files &&
@@ -64,11 +51,33 @@ const Index: React.FC<FormProps> = ({
     );
   }
 
+  useEffect(() => {
+    if (data) {
+      form.setFieldsValue({
+        ...data,
+        image_url: getDefaultFiles([data.image_url]),
+        images_url: [...getDefaultFiles(data.images_url)],
+        year: moment(data.year),
+      });
+    }
+  }, [form, data]);
+
+  function getPhotosPath(values: any) {
+    return values.fileList.map((item: any) => item.response.path);
+  }
+
   const onFinish = (values: any) => {
+    const imageUrl = values.image_url.fileList
+      ? getPhotosPath(values.image_url)
+      : values.image_url[0].name;
+
+    const imagesUrl = values.images_url.fileList
+      ? getPhotosPath(values.images_url)
+      : values.images_url;
     onSubmit({
       ...values,
-      image_url: values.image_url[0].response.path,
-      images_url: getPhotosPath(values.images_url),
+      image_url: imageUrl,
+      images_url: imagesUrl,
     });
   };
 
@@ -98,6 +107,7 @@ const Index: React.FC<FormProps> = ({
   }
 
   const handleChange = (info: any) => {
+    console.log(info);
     if (info.file.status === 'uploading') {
       setLoading(true);
       return;
@@ -183,7 +193,7 @@ const Index: React.FC<FormProps> = ({
       </Form.Item>
       <Form.Item
         label="Тип Кузова"
-        name="category"
+        name="category_id"
         rules={[{ required: true, message: 'Укажите кузов' }]}
       >
         <Select
@@ -227,7 +237,7 @@ const Index: React.FC<FormProps> = ({
           beforeUpload={beforeUpload}
           onChange={handleChangeAlbum}
           listType="picture-card"
-          defaultFileList={data && [...getDefaultFiles(data.images_url)]}
+          defaultFileList={data ? [...getDefaultFiles(data.images_url)] : []}
         >
           <UploadOutlined /> Upload
         </Upload>

@@ -15,9 +15,9 @@ export function App() {
   const session = useSession();
   const waiting = useSessionWaiting();
 
-  const routes = useMemo(() => protectedRoutes(ROUTES, { root: 'DEV', auth: !!session }), [
-    session,
-  ]);
+  const routes = useMemo(() => {
+    return protectedRoutes(ROUTES, { root: 'DEV', auth: !!session });
+  }, [session]);
 
   if (waiting) {
     return <div>Loading</div>;

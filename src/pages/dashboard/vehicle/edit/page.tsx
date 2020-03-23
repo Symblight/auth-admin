@@ -1,10 +1,22 @@
 import React from 'react';
 import { Card, Button, Skeleton } from 'antd';
+import _ from 'lodash';
+import { useStore } from 'effector-react';
+import { useAlert } from 'react-alert';
 
 import { Breadcrumb } from 'components';
 import { RouteComponentProps, RouteProps, Link, useRouteMatch } from 'react-router-dom';
-import { FormVehicle } from 'features/vehicles';
-import { TCar, TCategory } from 'stores';
+import { TCar, TCategory, FormVehicle } from 'features/vehicles';
+
+import {
+  $categories,
+  $vehicle,
+  pageMounted,
+  pageUnmounted,
+  submitFormVehicle,
+  getCategories,
+  $error,
+} from './model';
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
@@ -15,17 +27,31 @@ interface PageProps extends RouteComponentProps {
   onFetchCategories: () => void;
 }
 
-export const Page: React.FC<PageProps> = ({
-  data,
-  loading,
-  categories,
-  lodaingCategories,
-  onFetchCategories,
-}) => {
+export const EditVehiclePage: React.FC<PageProps> = () => {
+  const vehicle = useStore($vehicle);
+  const categories = useStore($categories);
+  const error = useStore($error);
+  const alert = useAlert();
+
   const match = useRouteMatch<{ id: string }>();
+
   const handleSubmit = (values: any) => {
-    console.log(values);
+    submitFormVehicle({ id: vehicle.id, ...values });
   };
+
+  React.useEffect(() => {
+    pageMounted(match.params.id);
+  }, [match.params.id]);
+
+  React.useEffect(() => {
+    return () => pageUnmounted();
+  }, []);
+
+  React.useEffect(() => {
+    if (error && error.message) {
+      alert.error(error.message);
+    }
+  }, [error, alert]);
 
   function submit() {
     return (
@@ -47,17 +73,17 @@ export const Page: React.FC<PageProps> = ({
         <Breadcrumb.Item>Редактировать</Breadcrumb.Item>
       </Breadcrumb>
       <Card>
-        {!loading ? (
+        {!_.isEmpty(vehicle) ? (
           <FormVehicle
             categories={categories}
-            lodaingCategories={lodaingCategories}
-            onFetchCategories={onFetchCategories}
-            data={data || null}
+            lodaingCategories={false}
+            onFetchCategories={() => null}
+            data={!_.isEmpty(vehicle) ? vehicle : null}
             submitButton={submit()}
             onSubmit={handleSubmit}
           />
         ) : (
-          <Skeleton active={loading} />
+          <Skeleton active={_.isEmpty(vehicle)} />
         )}
       </Card>
     </>

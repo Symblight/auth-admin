@@ -31,7 +31,14 @@ function getApiUrl(path: string, rootRelative?: string) {
   });
 }
 
-export function Request<T, Data = any>(request: RequestConfig<Data>): Promise<T> {
+/**
+ *
+ * @param request RequestData = input type ResponseData = output type
+ */
+
+export function Request<RequestData = any, ResponseData = any>(
+  request: RequestConfig<RequestData>,
+): Promise<ResponseData> {
   const formattedUrl = getApiUrl(request.url);
   const headers = {
     Accept: 'application/json',
@@ -56,7 +63,7 @@ export function Request<T, Data = any>(request: RequestConfig<Data>): Promise<T>
 
   return new Promise((resolve, reject) =>
     axios(requestConfig)
-      .then((response: AxiosResponse<T>) => {
+      .then((response: AxiosResponse<ResponseData>) => {
         const { data } = response;
         resolve(data);
       })

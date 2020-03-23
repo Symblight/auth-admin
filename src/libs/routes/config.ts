@@ -1,5 +1,4 @@
 import { RouteComponentProps } from 'react-router-dom';
-
 import { redirectTo } from './routes';
 
 export type ExternalRouteProps<Ctx = any> = {
@@ -36,15 +35,17 @@ function next(to: string) {
 
 function compileRoute<C>(route: Route<C>, context: C): Route<C> | null {
   const { guards } = route;
-  let compileRoutes: Route<C> | null = { ...route };
+  let compileRoutes: Route<C> = { ...route };
   if (guards) {
     guards.map(guard => {
       const res = guard(route, context, next);
 
-      if (compileRoutes !== null && typeof res === 'string') {
-        compileRoutes.component = redirectTo.bind(null, { to: res });
-      } else if (typeof res === 'object') {
-        compileRoutes = res;
+      if (res !== null) {
+        if (typeof res === 'string') {
+          compileRoutes.component = redirectTo.bind(null, { to: res });
+        } else if (typeof res === 'object') {
+          compileRoutes = res;
+        }
       }
     });
   }
