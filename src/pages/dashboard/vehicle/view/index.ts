@@ -1,1 +1,1 @@
-export { VehiclePage } from './model';
+export { VehiclePage } from './page';
