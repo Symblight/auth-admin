@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Pagination as PaginationAntd } from 'antd';
 import { Link } from 'react-router-dom';
-import { TPagination } from 'stores';
+import { TPagination } from 'features/common';
 
 export interface PaginationProps {
   pagination: TPagination | null;
@@ -10,6 +10,7 @@ export interface PaginationProps {
 
 export const Pagination: React.FC<PaginationProps> = ({ pagination }) => {
   function itemRender(current: number, type: string, originalElement: React.ReactNode) {
+    if (pagination === null) return null;
     if (type === 'prev') {
       return <Link to={`/d/?page=${pagination.perPage}`}>{'<'}</Link>;
     }

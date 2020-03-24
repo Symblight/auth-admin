@@ -1,4 +1,5 @@
 import React from 'react';
+import { useStore } from 'effector-react';
 import { Skeleton, Button, Descriptions, Card } from 'antd';
 
 import {
@@ -9,9 +10,11 @@ import {
   useRouteMatch,
 } from 'react-router-dom';
 import { Breadcrumb, PreviewImage } from 'components';
-import { TCar } from 'stores';
+import { TCar } from 'features/vehicles';
 
 import { Wrapper, Photos, Header, Image } from './styled';
+
+import { $vehicle, getVehicle, pageMounted, pageUnMounted } from './model';
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
@@ -19,9 +22,19 @@ interface PageProps extends RouteComponentProps {
   loading: boolean;
 }
 
-export const Page: React.FC<PageProps> = ({ data, loading }) => {
+export const VehiclePage: React.FC<PageProps> = () => {
+  const loading = useStore(getVehicle.pending);
+  const data = useStore($vehicle);
   const match = useRouteMatch<{ id: string }>();
   const location = useLocation();
+
+  React.useEffect(() => {
+    pageMounted(match.params.id);
+  }, [match.params.id]);
+
+  React.useEffect(() => {
+    return () => pageUnMounted();
+  }, []);
 
   function renderImages(images: string[]) {
     if (Array.isArray(images)) {

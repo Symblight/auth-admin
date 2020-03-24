@@ -1,47 +1,48 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, Button } from 'antd';
+import { useStore } from 'effector-react';
 
-import { RouteComponentProps, RouteProps, Link, useHistory } from 'react-router-dom';
-import { observer } from 'mobx-react';
+import { RouteComponentProps, RouteProps, Link } from 'react-router-dom';
 
-import { TStore, TCar, TCategory } from 'stores';
+import { FormVehicle, TCar } from 'features/vehicles';
+import { Breadcrumb } from 'components';
 
-import { FormVehicle } from 'features/vehicles';
-import { useStores, Breadcrumb } from 'components';
+import {
+  pageUnMounted,
+  $categories,
+  $isError,
+  $isLoading,
+  submitForm,
+  getCategories,
+} from './model';
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
 }
 
-export const AddVehiclePage: React.FC<PageProps> = observer(({}) => {
-  const history = useHistory();
-  const [loading, setLoading] = useState(false);
-  const [lodaingCategories, setLoadingCategories] = useState(false);
-  const { cars } = useStores<TStore>();
+export const AddVehiclePage: React.FC<PageProps> = () => {
+  const categories = useStore($categories);
+  const error = useStore($isError);
+  const { loadingCategories, loadingSubmit } = useStore($isLoading);
 
-  const handleSubmit = async (values: TCar) => {
-    await setLoading(true);
-    await cars.setApiCar(values);
-    await setLoading(false);
-    history.push('/d');
+  React.useEffect(() => {
+    return () => pageUnMounted();
+  }, []);
+
+  const handleSubmit = (values: TCar) => {
+    submitForm(values);
   };
 
   function submit() {
     return (
-      <Button loading={loading} type="primary" htmlType="submit">
+      <Button loading={loadingSubmit} type="primary" htmlType="submit">
         Добавить
       </Button>
     );
   }
 
   async function handleFetchCategories() {
-    try {
-      setLoadingCategories(true);
-      await cars.getCategories();
-      setLoadingCategories(false);
-    } catch (error) {
-      console.log(error);
-    }
+    getCategories();
   }
 
   return (
@@ -54,8 +55,8 @@ export const AddVehiclePage: React.FC<PageProps> = observer(({}) => {
       </Breadcrumb>
       <Card>
         <FormVehicle
-          categories={cars.categories}
-          lodaingCategories={lodaingCategories}
+          categories={categories}
+          lodaingCategories={loadingCategories}
           onFetchCategories={handleFetchCategories}
           submitButton={submit()}
           onSubmit={handleSubmit}
@@ -63,4 +64,4 @@ export const AddVehiclePage: React.FC<PageProps> = observer(({}) => {
       </Card>
     </>
   );
-});
+};

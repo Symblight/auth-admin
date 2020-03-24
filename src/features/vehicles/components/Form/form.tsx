@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Select, Input, DatePicker, Upload, message } from 'antd';
 import { UploadOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
-import { TCar, TCategory } from 'stores';
+import { TCar, TCategory } from 'features/vehicles';
 
 import { Form } from './styled';
 

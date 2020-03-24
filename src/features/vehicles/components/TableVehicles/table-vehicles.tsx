@@ -4,7 +4,8 @@ import { Table, Modal } from 'antd';
 import _ from 'lodash';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { TCar, TPagination, TCategory } from 'stores';
+import { TCar } from 'features/vehicles';
+import { TPagination } from 'features/common';
 import { Pagination, PreviewImage } from 'components';
 
 const { confirm } = Modal;
