@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStore } from 'effector-react';
-import { Skeleton, Button, Descriptions, Card } from 'antd';
+import { Skeleton, Button, Descriptions, Card, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 import {
   RouteComponentProps,
@@ -14,7 +15,9 @@ import { TCar } from 'features/vehicles';
 
 import { Wrapper, Photos, Header, Image } from './styled';
 
-import { $vehicle, getVehicle, pageMounted, pageUnMounted } from './model';
+import { $vehicle, getVehicle, pageMounted, pageUnMounted, fetchDelete } from './model';
+
+const { confirm } = Modal;
 
 interface PageProps extends RouteComponentProps {
   routes: RouteProps[];
@@ -56,6 +59,19 @@ export const VehiclePage: React.FC<PageProps> = () => {
       </Card>
     );
 
+  function showDeleteConfirm(value: string | number) {
+    confirm({
+      title: 'Вы уверены что хотите удалить машину?',
+      icon: <ExclamationCircleOutlined />,
+      okText: 'Удалить',
+      okType: 'danger',
+      cancelText: 'Отмена',
+      onOk() {
+        fetchDelete(value);
+      },
+    });
+  }
+
   if (data === null) return null;
 
   return (
@@ -72,7 +88,9 @@ export const VehiclePage: React.FC<PageProps> = () => {
             <Link to={`/d/v/${match.params.id}/edit`}>
               <Button type="primary">Редактировать</Button>
             </Link>
-            <Button type="danger">Удалить</Button>
+            <Button type="danger" onClick={() => (data.id ? showDeleteConfirm(data.id) : null)}>
+              Удалить
+            </Button>
           </Header>
           <Image src={data.image_url} alt="car" />
           <Photos>{data.images_url && renderImages(data.images_url)}</Photos>

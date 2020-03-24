@@ -19,7 +19,7 @@ const layout = {
 interface FormProps {
   submitButton: React.ReactNode;
   onSubmit: (values: TCar) => void;
-  data: TCar | null;
+  data?: TCar;
   categories: TCategory[];
   lodaingCategories: boolean;
   onFetchCategories: () => void;
@@ -69,7 +69,7 @@ const Index: React.FC<FormProps> = ({
   const onFinish = (values: any) => {
     const imageUrl = values.image_url.fileList
       ? getPhotosPath(values.image_url)
-      : values.image_url[0].name;
+      : values.image_url[0].response.path;
 
     const imagesUrl = values.images_url.fileList
       ? getPhotosPath(values.images_url)
@@ -107,7 +107,6 @@ const Index: React.FC<FormProps> = ({
   }
 
   const handleChange = (info: any) => {
-    console.log(info);
     if (info.file.status === 'uploading') {
       setLoading(true);
       return;
