@@ -14,7 +14,6 @@ const paths = {
   publicPath: '/static/',
   libs: resolveApp('src/libs'),
   pages: resolveApp('src/pages'),
-  stores: resolveApp('src/stores'),
 };
 
 paths.resolveModules = [

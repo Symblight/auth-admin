@@ -10,7 +10,7 @@ import {
   useRouteMatch,
 } from 'react-router-dom';
 import { Breadcrumb, PreviewImage } from 'components';
-import { TCar } from 'stores';
+import { TCar } from 'features/vehicles';
 
 import { Wrapper, Photos, Header, Image } from './styled';
 

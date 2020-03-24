@@ -40,7 +40,6 @@ module.exports = {
       mocks: paths.mocks,
       libs: paths.libs,
       pages: paths.pages,
-      stores: paths.stores,
     },
     modules: ['node_modules'],
   },

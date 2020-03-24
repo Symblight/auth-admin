@@ -6,4 +6,3 @@ export { Breadcrumb } from './Breadcrumb';
 export { Pagination } from './Pagination';
 export { PreviewImage } from './PreviewImage';
 export { AlertProvider } from './AlertProvider';
-export * from './StoreProvider';

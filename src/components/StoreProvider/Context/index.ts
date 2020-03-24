@@ -1,1 +1,0 @@
-export { storeContext } from './context';
