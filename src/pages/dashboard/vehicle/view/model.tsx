@@ -1,4 +1,4 @@
-import { createEffect, createStore, createEvent, combine, guard } from 'effector';
+import { createEffect, createStore, createEvent, guard } from 'effector';
 import { Request } from 'libs/api';
 
 import { TCar } from 'features/vehicles';
