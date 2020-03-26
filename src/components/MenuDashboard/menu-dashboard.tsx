@@ -14,6 +14,10 @@ export const MenuDashboard: React.FC<MenuProps> = () => {
         <span>Машины</span>
         <Link to="/d" />
       </Menu.Item>
+      <Menu.Item key="categories">
+        <span>Категории</span>
+        <Link to="/d/c" />
+      </Menu.Item>
       <Menu.Item key="rents">
         Аренда
         <Link to="/d/rents" />

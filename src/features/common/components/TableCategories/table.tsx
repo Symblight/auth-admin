@@ -3,29 +3,29 @@ import React from 'react';
 import { Table, Modal } from 'antd';
 import _ from 'lodash';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
-import { TCar } from 'features/vehicles';
+import { TCategory } from 'features/vehicles';
 import { TPagination } from 'features/common';
-import { Pagination, PreviewImage } from 'components';
+import { Pagination } from 'components';
 
 const { confirm } = Modal;
 
-export interface TableVehicleProps {
+export interface TableCategoryProps {
   match: string;
   onDelete: (value: string) => void;
-  source: TCar[];
+  onEdit: (value: TCategory) => void;
+  onShow?: (value: string) => void;
+  source: TCategory[];
   pagination: TPagination | null;
   loading: boolean;
   search: string;
 }
 
-export const TableVehicle: React.FC<TableVehicleProps> = ({
-  match,
+export const TableCategories: React.FC<TableCategoryProps> = ({
   onDelete,
   source = [],
   pagination,
   loading,
-  search,
+  onEdit,
 }) => {
   function deleteCar(id: string) {
     onDelete(id);
@@ -33,7 +33,7 @@ export const TableVehicle: React.FC<TableVehicleProps> = ({
 
   function showDeleteConfirm(value: string) {
     confirm({
-      title: 'Вы уверены что хотите удалить машину?',
+      title: 'Вы уверены что хотите удалить категорию?',
       icon: <ExclamationCircleOutlined />,
       okText: 'Удалить',
       okType: 'danger',
@@ -49,39 +49,24 @@ export const TableVehicle: React.FC<TableVehicleProps> = ({
       title: 'Название',
       dataIndex: 'title',
       key: 'title',
-      render: (text: string, record: TCar) => <Link to={`${match}/v/${record.id}`}>{text}</Link>,
-    },
-    {
-      title: 'Фото',
-      dataIndex: 'image_url',
-      key: 'image',
-      render: (text: string) => {
-        return <PreviewImage url={{ path: match, search: `${search}&photo=${text}` }} />;
-      },
-    },
-    {
-      title: 'Цена',
-      dataIndex: 'price',
-      key: 'price',
     },
     {
       title: '',
       dataIndex: '',
       key: 'edit',
-      render: (text: string, record: TCar) => (
-        <Link to={`${match}/v/${record.id}/edit`}>Редактировать</Link>
+      render: (text: string, record: TCategory) => (
+        <div onClick={() => onEdit(record)}>Редактировать</div>
       ),
     },
     {
       title: '',
       dataIndex: '',
       key: 'remove',
-      render: (text: string, record: TCar) => (
+      render: (text: string, record: TCategory) => (
         <span onClick={() => record.id && showDeleteConfirm(record.id)}>Удалить</span>
       ),
     },
   ];
-
   return (
     <>
       <Table
@@ -91,7 +76,7 @@ export const TableVehicle: React.FC<TableVehicleProps> = ({
         loading={loading}
         rowKey={() => _.uniqueId('row-')}
       />
-      <Pagination url="/d/" pagination={pagination} />
+      <Pagination url="/d/c/" pagination={pagination} />
     </>
   );
 };

@@ -11,6 +11,7 @@ import {
   EditVehiclePage,
   VehicleViewPage,
   LogoutPage,
+  CategoriesPage,
 } from 'pages';
 
 import { onlyAuth, onlyAnon } from 'features/common';
@@ -59,6 +60,11 @@ export const ROUTES: Route<any>[] = [
         path: '/d/rents',
         exact: true,
         component: RentsPage,
+      },
+      {
+        path: '/d/c',
+        exact: true,
+        component: CategoriesPage,
       },
     ],
   },

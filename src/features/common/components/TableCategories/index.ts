@@ -1,0 +1,1 @@
+export { TableCategories } from './table';

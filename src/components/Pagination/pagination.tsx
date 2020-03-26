@@ -6,19 +6,20 @@ import { TPagination } from 'features/common';
 
 export interface PaginationProps {
   pagination: TPagination | null;
+  url: string;
 }
 
-export const Pagination: React.FC<PaginationProps> = ({ pagination }) => {
+export const Pagination: React.FC<PaginationProps> = ({ url, pagination }) => {
   function itemRender(current: number, type: string, originalElement: React.ReactNode) {
     if (pagination === null) return null;
     if (type === 'prev') {
-      return <Link to={`/d/?page=${pagination.perPage}`}>{'<'}</Link>;
+      return <Link to={`${url}?page=${pagination.perPage}`}>{'<'}</Link>;
     }
     if (type === 'next') {
-      return <Link to={`/d/?page=${pagination.page + current}`}>{'>'}</Link>;
+      return <Link to={`${url}?page=${pagination.page + current}`}>{'>'}</Link>;
     }
     if (type === 'page') {
-      return <Link to={`/d/?page=${current}`}>{current}</Link>;
+      return <Link to={`${url}?page=${current}`}>{current}</Link>;
     }
     return originalElement;
   }
