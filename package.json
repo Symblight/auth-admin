@@ -64,7 +64,7 @@
   "dependencies": {
     "@types/lodash": "^4.14.149",
     "antd": "^4.0.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "effector": "^20.13.0",
     "effector-react": "^20.6.3",
     "history": "^4.10.1",
